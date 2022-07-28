@@ -24,7 +24,9 @@ export default class AuctionManager {
   async createList(ownerAddr, nftContractAddr, tokenIds, minPrices, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
-    if (this.#lists.find((list) => list.ownerAddr === ownerAddr && list.nftContractAddr === nftContractAddr)) {
+    const listsArray = Object.values(this.#lists);
+
+    if (listsArray.find((list) => list.ownerAddr === ownerAddr && list.nftContractAddr === nftContractAddr)) {
       ret.status = 'error';
       ret.message = 'List already created, please add tokens individually';
       return ret;
@@ -92,7 +94,7 @@ export default class AuctionManager {
   async deletList(listId, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
-    if (! listId in this.#lists) {
+    if (! this.#lists[listId]) {
       ret.status = 'error';
       ret.message = 'Invalid listId';
       return ret;
@@ -135,15 +137,15 @@ export default class AuctionManager {
  * Adds a token to an allready existing auction list.
  * @param {Number} listId Id of list.
  * @param {String} nftContractAddr Address of nft collection.
- * @param {Array}  tokenId Token id to put on auction.
- * @param {Array}  minPrice Minimum price of token.
+ * @param {Number}  tokenId Token id to put on auction.
+ * @param {Number}  minPrice Minimum price of token.
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
   async addTokenToList(listId, nftContractAddr, tokenId, minPrice, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
-    if (! listId in this.#lists) {
+    if (! this.#lists[listId]) {
       ret.status = 'error';
       ret.message = 'Invalid listId';
       return ret;
@@ -211,7 +213,7 @@ export default class AuctionManager {
 
     const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
 
-    if (index < -1) {
+    if (idx === -1 || ! idx) {
       ret.status = 'error';
       ret.message = 'Invalid listId or tokenId';
       return ret;
@@ -243,7 +245,13 @@ export default class AuctionManager {
  * @return {Object} Info of token.
  */
   getToken(listId, tokenId) {
-    if (! this.#lists[listId]?.tokenIds.includes(tokenId)) return;
+    const ret = {status: 'error', message: 'default error'};
+
+    if (! this.#lists[listId]?.tokenIds.includes(tokenId)) {
+      ret.status = 'error';
+      ret.message = 'Invalid listId or tokenId';
+      return ret;
+    }
 
     const {ownerAddr, nftContractAddr, bids} = this.#lists[listId];
     const idx = this.#lists[listId].tokenIds.indexOf(tokenId);
@@ -256,12 +264,16 @@ export default class AuctionManager {
       bestBid = Math.max(...filteredBids.map( (bid) => bid.erc20amount));
     }
 
-    return {
+    ret.status = 'success';
+    ret.message = 'Token found';
+    ret.data = {
       ownerAddr,
       nftContractAddr,
       minPrice,
       bestBid,
     };
+
+    return ret;
   }
 
   /**
@@ -271,14 +283,16 @@ export default class AuctionManager {
  * @param {String} nftContractAddr Address of nft collection.
  * @param {Array}  tokenId Tokens ids.
  * @param {String} erc20ContractAddr Address of ERC20 contract.
- * @param {Number} erc20amount Token id to put on auction.
+ * @param {Number} erc20amount Amount of ERC20 token.
  * @param {String} bidderSignature Bidder signature of message.
  * @return {Object} Status object.
  */
   async addBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
     const ret = {status: 'error', message: 'default error'};
 
-    const list = this.#lists.find( (list) => list.nftContractAddr === nftContractAddr && list.ownerAddr === ownerAddr);
+    const listsArray = Object.values(this.#lists);
+
+    const list = listsArray.find( (list) => list.nftContractAddr === nftContractAddr && list.ownerAddr === ownerAddr);
 
     const listId = list?.listId;
 
@@ -287,6 +301,20 @@ export default class AuctionManager {
       ret.message = 'No auction list with those nftContractAddr and ownerAddr';
       return ret;
     };
+
+    if (! this.#lists[listId].tokenIds.includes(tokenId)) {
+      ret.status = 'error';
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+
+    const idx = this.#lists[listId].tokenIds.indexOf(tokenId);
+
+    if ( this.#lists[listId].minPrices[idx] > erc20amount) {
+      ret.status = 'error';
+      ret.message = 'erc20amount is less than min price';
+      return ret;
+    }
 
     if (! await this.#checker.isValidAddr(bidderAddr)) {
       ret.status = 'error';
@@ -365,7 +393,7 @@ export default class AuctionManager {
       return ret;
     };
 
-    const newBids = this.#lists[listId].bids.map((bid) => {
+    const newBids = this.#lists[listId].bids.filter((bid) => {
       return !( bid.tokenId === tokenId && bid.bidderAddr === bidderAddr);
     });
 
@@ -391,6 +419,173 @@ export default class AuctionManager {
     return ret;
   }
 
+  /**
+ * Approves a bid.
+ * @param {String} ownerAddr Address of nft's owner.
+ * @param {String} bidderAddr Address of bidder.
+ * @param {String} nftContractAddr Address of nft collection.
+ * @param {Array}  tokenId Tokens ids.
+ * @param {String} erc20ContractAddr Address of ERC20 contract.
+ * @param {Number} erc20amount Amount of ERC20 token.
+ * @param {String} ownerSignature Signautre of owner.
+ * @return {Object} Status object.
+ */
+  async approveBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, ownerSignature) {
+    const ret = {status: 'error', message: 'default error'};
+
+    const listsArray = Object.values(this.#lists);
+
+    const list = listsArray.find( (list) => list.nftContractAddr === nftContractAddr && list.ownerAddr === ownerAddr);
+
+    const listId = list?.listId;
+
+    if (! list) {
+      ret.status = 'error';
+      ret.message = 'No auction list with those nftContractAddr and ownerAddr';
+      return ret;
+    };
+
+    if (! await this.#checker.isSignatureValid(ownerSignature, bidderAddr,
+        ownerAddr,
+        bidderAddr,
+        nftContractAddr,
+        tokenId,
+        erc20ContractAddr,
+        erc20amount)) {
+      ret.status = 'error';
+      ret.message = 'Invalid Bidder Signature';
+      return ret;
+    }
+
+    const {bids} = this.#lists[listId];
+
+    const bid = bids.find( (bid) => bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
+
+    if (! bid ) {
+      ret.status = 'error';
+      ret.message = 'There is no bid with provided argumetns bidderAddr and tokenId';
+      return ret;
+    }
+
+    if (! (bid.erc20ContractAddr === erc20ContractAddr && bid.erc20amount === erc20amount) ) {
+      ret.status = 'error';
+      ret.message = 'erc20ContractAddr or erc20amount arguments not equal to auction list data';
+      return ret;
+    }
+
+    if (! await this.#checker.isERC20AmountApproved(erc20ContractAddr, bidderAddr, erc20amount)) {
+      ret.status = 'error';
+      ret.message = 'ERC20 amount is not longer approved to Market, Bid Deleted';
+      bids = bids.map((bid) => {
+        return !( bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
+      });
+      return ret;
+    }
+
+    if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
+      ret.status = 'error';
+      ret.message = `The tokenId[${tokenId}] is not longer approved to NFT Market, deleting token`;
+      localDeletToken(listId, tokenId);
+      return ret;
+    }
+
+    bid.ownerSignature = ownerSignature;
+    bid.approval = true;
+
+    ret.status = 'success';
+    ret.message = 'Successfully approved bid. on-chain transaction now can be executed';
+    ret.bid = {
+      ownerAddr,
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
+      ownerSignature,
+      bidderSignature: bid.bidderSignature,
+    };
+
+    return ret;
+  }
+
+  /**
+ * Deletes a token without signature of owner.
+ * @param {Number} listId Id of list.
+ * @param {Array}  tokenId Tokens ids to be deleted.
+ * @param {String} bidderAddr Address of bidder.
+ * @return {Object} Status object.
+*/
+  async getApprovedBid(listId, tokenId, bidderAddr) {
+    const ret = {status: 'error', message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = 'error';
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const bids = this.#lists[listId].bids;
+    const bid = bids.find( (bid) => bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
+
+    if (! bid ) {
+      ret.status = 'error';
+      ret.message = 'There is no bid with provided argumetns bidderAddr and tokenId';
+      return ret;
+    }
+
+    if (! bid.approval) {
+      ret.status = 'error';
+      ret.message = 'Bid not yet approved';
+      return ret;
+    }
+
+    const {ownerAddr, nftContractAddr} = this.#lists[listId];
+    const {erc20ContractAddr, erc20amount, ownerSignature, bidderSignature} = bid;
+
+    if (! await this.#checker.isERC20AmountApproved(erc20ContractAddr, bidderAddr, erc20amount)) {
+      ret.status = 'error';
+      ret.message = 'ERC20 amount is not longer approved to Market, Bid Deleted';
+      bids = bids.map((bid) => {
+        return !( bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
+      });
+      return ret;
+    }
+
+    if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
+      ret.status = 'error';
+      ret.message = `The tokenId[${tokenId}] is not longer approved to NFT Market, deleting token`;
+      localDeletToken(listId, tokenId);
+      return ret;
+    }
+
+    ret.status = 'success';
+    ret.message = 'On-chain transaction can be executed';
+
+    ret.bid = {
+      ownerAddr,
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
+      ownerSignature,
+      bidderSignature,
+    };
+
+    return ret;
+  }
+
+  /**
+ * Deletes a token without signature of owner.
+ * @param {Number} listId Id of list.
+ * @param {Array}  tokenId Tokens ids to be deleted.
+*/
+  localDeletToken(listId, tokenId) {
+    const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
+
+    this.#lists[listId].tokenIds.splice(idx, 1);
+    this.#lists[listId].minPrices.splice(idx, 1);
+  }
 
   #lists;
   #nextListId;

@@ -17,5 +17,8 @@
     "eslint-config-google": "^0.14.0",
     "nodemon": "^2.0.19"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "jest": "^28.1.3"
+  }
 }
