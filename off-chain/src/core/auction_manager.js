@@ -54,20 +54,6 @@ export default class AuctionManager {
       return ret;
     }
 
-    for (const tokenId of tokenIds) {
-      if (! await this.#checker.validNftOwner(ownerAddr, nftContractAddr, tokenId)) {
-        ret.status = 'error'; 1;
-        ret.message = `The ownerAddr is not the owner of tokenId[${tokenId}]`;
-        return ret;
-      }
-
-      if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
-        ret.status = 'error';
-        ret.message = `The tokenId[${tokenId}] was not approved to NFT Market`;
-        return ret;
-      }
-    }
-
     const list = {
       listId: this.#nextListId++,
       ownerAddr,
@@ -172,18 +158,6 @@ export default class AuctionManager {
     if (! await this.#checker.isValidAddr(nftContractAddr)) {
       ret.status = 'error';
       ret.message = 'nftContractAddr Address is not valid';
-      return ret;
-    }
-
-    if (! await this.#checker.validNftOwner(ownerAddr, nftContractAddr, tokenId)) {
-      ret.status = 'error';
-      ret.message = `The ownerAddr is not the owner of tokenId[${tokenId}]`;
-      return ret;
-    }
-
-    if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
-      ret.status = 'error';
-      ret.message = `The tokenId[${tokenId}] was not approved to NFT Market`;
       return ret;
     }
 
@@ -328,12 +302,6 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isERC20AmountApproved(erc20ContractAddr, bidderAddr, erc20amount)) {
-      ret.status = 'error';
-      ret.message = 'ERC20 amount is not approved to Market';
-      return ret;
-    }
-
     if (! await this.#checker.isSignatureValid(bidderSignature, bidderAddr,
         ownerAddr,
         bidderAddr,
@@ -473,22 +441,6 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isERC20AmountApproved(erc20ContractAddr, bidderAddr, erc20amount)) {
-      ret.status = 'error';
-      ret.message = 'ERC20 amount is not longer approved to Market, Bid Deleted';
-      bids = bids.map((bid) => {
-        return !( bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
-      });
-      return ret;
-    }
-
-    if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
-      ret.status = 'error';
-      ret.message = `The tokenId[${tokenId}] is not longer approved to NFT Market, deleting token`;
-      localDeletToken(listId, tokenId);
-      return ret;
-    }
-
     bid.ownerSignature = ownerSignature;
     bid.approval = true;
 
@@ -542,22 +494,6 @@ export default class AuctionManager {
     const {ownerAddr, nftContractAddr} = this.#lists[listId];
     const {erc20ContractAddr, erc20amount, ownerSignature, bidderSignature} = bid;
 
-    if (! await this.#checker.isERC20AmountApproved(erc20ContractAddr, bidderAddr, erc20amount)) {
-      ret.status = 'error';
-      ret.message = 'ERC20 amount is not longer approved to Market, Bid Deleted';
-      bids = bids.map((bid) => {
-        return !( bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
-      });
-      return ret;
-    }
-
-    if (! await this.#checker.isNftApproved(ownerAddr, nftContractAddr, tokenId)) {
-      ret.status = 'error';
-      ret.message = `The tokenId[${tokenId}] is not longer approved to NFT Market, deleting token`;
-      localDeletToken(listId, tokenId);
-      return ret;
-    }
-
     ret.status = 'success';
     ret.message = 'On-chain transaction can be executed';
 
@@ -573,18 +509,6 @@ export default class AuctionManager {
     };
 
     return ret;
-  }
-
-  /**
- * Deletes a token without signature of owner.
- * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids to be deleted.
-*/
-  localDeletToken(listId, tokenId) {
-    const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
-
-    this.#lists[listId].tokenIds.splice(idx, 1);
-    this.#lists[listId].minPrices.splice(idx, 1);
   }
 
   #lists;

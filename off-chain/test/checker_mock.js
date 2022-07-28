@@ -7,16 +7,4 @@ export default class Checker {
   isSignatureValid() {
     return true;
   }
-
-  validNftOwner() {
-    return true;
-  }
-
-  isNftApproved() {
-    return true;
-  }
-
-  isERC20AmountApproved() {
-    return true;
-  }
 }

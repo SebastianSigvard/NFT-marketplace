@@ -8,10 +8,10 @@ const bidderAddr = '0xd59d413cb5a1f9A78948EB9A8a8db6CaBAE327F1';
 const nftContractAddr = '0x4Fdf0833d31DCF8Dc8eb14ffac49e1038ed75622';
 const erc20ContractAddr = '0xEBD12E72Cce970a7E7252a66AF2B6B39612287A3';
 
-const fakeOwnerAddr = '0x1ea77523c1E4D7CB2549c103835DFfA974194B14';
-const fakeBidderAddr = '0x90e8Cb2935Edc28F8360337e66986351bb5359C5';
-const fakeNftContractAddr = '0x2727CBD0bD0Ad6Ab87433cB67738595A36608d06q';
-const fakeErc20ContractAddr = '0xe70A9a95631B55df96fa2a1535E0F5E43C796C67';
+// const fakeOwnerAddr = '0x1ea77523c1E4D7CB2549c103835DFfA974194B14';
+// const fakeBidderAddr = '0x90e8Cb2935Edc28F8360337e66986351bb5359C5';
+// const fakeNftContractAddr = '0x2727CBD0bD0Ad6Ab87433cB67738595A36608d06q';
+// const fakeErc20ContractAddr = '0xe70A9a95631B55df96fa2a1535E0F5E43C796C67';
 
 const ownerSignature = 'FakeSignature';
 const bidderSignature = 'FakeSignature';
