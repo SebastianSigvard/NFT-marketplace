@@ -18,10 +18,17 @@ export default class AuctionManager {
  * @param {String} nftContractAddr Address of nft collection.
  * @param {Array}  tokenIds Tokens ids to put on auction.
  * @param {Array}  minPrices Minimum price of each token.
+ * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async createList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
+  async createList(ownerAddr, nftContractAddr, tokenIds, minPrices, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
+
+    if (this.#lists.find((list) => list.ownerAddr === ownerAddr && list.nftContractAddr === nftContractAddr)) {
+      ret.status = 'error';
+      ret.message = 'List already created, please add tokens individually';
+      return ret;
+    }
 
     if (! await this.#checker.isValidAddr(ownerAddr)) {
       ret.status = 'error';
@@ -32,6 +39,16 @@ export default class AuctionManager {
     if (! await this.#checker.isValidAddr(nftContractAddr)) {
       ret.status = 'error';
       ret.message = 'nftContractAddr Address is not valid';
+      return ret;
+    }
+
+    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+        ownerAddr,
+        nftContractAddr,
+        tokenIds,
+        minPrices)) {
+      ret.status = 'error';
+      ret.message = 'Invalid Owner Signature';
       return ret;
     }
 
@@ -50,6 +67,7 @@ export default class AuctionManager {
     }
 
     const list = {
+      listId: this.#nextListId++,
       ownerAddr,
       nftContractAddr,
       tokenIds,
@@ -57,9 +75,10 @@ export default class AuctionManager {
       bids: [],
     };
 
-    this.#lists[this.#nextListId++] = list;
+    this.#lists[list.listId] = list;
 
     ret.status = 'success';
+    ret.list = {...list};
     ret.message = 'Auction list successfully added to Market';
     return ret;
   }
@@ -67,15 +86,32 @@ export default class AuctionManager {
   /**
  * Deletes an auction list.
  * @param {Number} listId Id of list.
- * @return {Boolean} true or false if listId existed.
+ * @param {String} ownerSignature Signautre of owner.
+ * @return {Object} Status object.
  */
-  deletList(listId) {
-    if (listId in this.#lists) {
-      delete this.#lists[listId];
-      return true;
+  async deletList(listId, ownerSignature) {
+    const ret = {status: 'error', message: 'default error'};
+
+    if (! listId in this.#lists) {
+      ret.status = 'error';
+      ret.message = 'Invalid listId';
+      return ret;
     }
 
-    return false;
+    const {ownerAddr} = this.#lists[listId];
+
+    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+        listId)) {
+      ret.status = 'error';
+      ret.message = 'Invalid Owner Signature';
+      return ret;
+    }
+
+    delete this.#lists[listId];
+
+    ret.status = 'success';
+    ret.message = 'List deleted';
+    return ret;
   }
 
   /**
@@ -98,14 +134,32 @@ export default class AuctionManager {
   /**
  * Adds a token to an allready existing auction list.
  * @param {Number} listId Id of list.
- * @param {String} ownerAddr Address of nft's owner.
  * @param {String} nftContractAddr Address of nft collection.
  * @param {Array}  tokenId Token id to put on auction.
  * @param {Array}  minPrice Minimum price of token.
+ * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async addTokenToList(listId, ownerAddr, nftContractAddr, tokenId, minPrice) {
+  async addTokenToList(listId, nftContractAddr, tokenId, minPrice, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
+
+    if (! listId in this.#lists) {
+      ret.status = 'error';
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const {ownerAddr} = this.#lists[listId];
+
+    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+        listId,
+        nftContractAddr,
+        tokenId,
+        minPrice)) {
+      ret.status = 'error';
+      ret.message = 'Invalid Owner Signature';
+      return ret;
+    }
 
     if (! await this.#checker.isValidAddr(ownerAddr)) {
       ret.status = 'error';
@@ -149,18 +203,37 @@ export default class AuctionManager {
  * Deletes a token from an auction list.
  * @param {Number} listId Id of list.
  * @param {Array}  tokenId Tokens ids to be deleted.
- * @return {Boolean} true or false if listId existed and tokenId too.
+ * @param {String} ownerSignature Signautre of owner.
+ * @return {Object} Status object.
  */
-  deletToken(listId, tokenId) {
+  async deletToken(listId, tokenId, ownerSignature) {
+    const ret = {status: 'error', message: 'default error'};
+
     const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
 
-    if (index < -1) return false;
+    if (index < -1) {
+      ret.status = 'error';
+      ret.message = 'Invalid listId or tokenId';
+      return ret;
+    }
+
+    const {ownerAddr} = this.#lists[listId];
+
+    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+        listId,
+        tokenId)) {
+      ret.status = 'error';
+      ret.message = 'Invalid Owner Signature';
+      return ret;
+    }
 
     this.#lists[listId].tokenIds.splice(idx, 1);
     this.#lists[listId].minPrices.splice(idx, 1);
     this.#lists[listId].bids = this.#lists[listId].bids.map((bid) => bid.tokenId !== tokenId);
 
-    return true;
+    ret.status = 'success';
+    ret.message = 'Token deleted';
+    return ret;
   }
 
   /**
@@ -193,20 +266,25 @@ export default class AuctionManager {
 
   /**
  * Adds a bid to a specific token id of a specific auction list.
- * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids.
+ * @param {String} ownerAddr Address of nft's owner.
  * @param {String} bidderAddr Address of bidder.
+ * @param {String} nftContractAddr Address of nft collection.
+ * @param {Array}  tokenId Tokens ids.
  * @param {String} erc20ContractAddr Address of ERC20 contract.
  * @param {Number} erc20amount Token id to put on auction.
- * @param {String} bidderSignature Minimum price of token.
+ * @param {String} bidderSignature Bidder signature of message.
  * @return {Object} Status object.
  */
-  async addBid(listId, tokenId, bidderAddr, erc20ContractAddr, erc20amount, bidderSignature) {
+  async addBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
     const ret = {status: 'error', message: 'default error'};
 
-    if (! this.#lists[listId]?.tokenIds.includes(tokenId)) {
+    const list = this.#lists.find( (list) => list.nftContractAddr === nftContractAddr && list.ownerAddr === ownerAddr);
+
+    const listId = list?.listId;
+
+    if (! list) {
       ret.status = 'error';
-      ret.message = 'Invalid listId or TokenId';
+      ret.message = 'No auction list with those nftContractAddr and ownerAddr';
       return ret;
     };
 
@@ -228,11 +306,7 @@ export default class AuctionManager {
       return ret;
     }
 
-    const {ownerAddr, nftContractAddr, bids} = this.#lists[listId];
-
-    if (! await this.#checker.isSignatureValid(
-        bidderSignature,
-        bidderAddr,
+    if (! await this.#checker.isSignatureValid(bidderSignature, bidderAddr,
         ownerAddr,
         bidderAddr,
         nftContractAddr,
@@ -241,7 +315,10 @@ export default class AuctionManager {
         erc20amount)) {
       ret.status = 'error';
       ret.message = 'Invalid Bidder Signature';
+      return ret;
     }
+
+    const {bids} = this.#lists[listId];
 
     let bid = bids.find( (bid) => bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
 
@@ -288,19 +365,26 @@ export default class AuctionManager {
       return ret;
     };
 
-    if (! await this.#checker.isSignatureValid(
-        bidderSignature,
-        bidderAddr,
+    const newBids = this.#lists[listId].bids.map((bid) => {
+      return !( bid.tokenId === tokenId && bid.bidderAddr === bidderAddr);
+    });
+
+    if (newBids.length === this.#lists[listId].bids.length) {
+      ret.status = 'error';
+      ret.message = 'No bid found with that bidderAddr and tokenId';
+      return ret;
+    }
+
+    if (! await this.#checker.isSignatureValid(bidderSignature, bidderAddr,
         listId,
         tokenId,
         bidderAddr)) {
       ret.status = 'error';
       ret.message = 'Invalid Bidder Signature';
+      return ret;
     }
 
-    this.#lists[listId].bids = this.#lists[listId].bids.map((bid) => {
-      return !( bid.tokenId === tokenId && bid.bidderAddr === bidderAddr);
-    });
+    this.#lists[listId].bids = newBids;
 
     ret.status = 'success';
     ret.message = 'Bid deleted';
@@ -312,7 +396,3 @@ export default class AuctionManager {
   #nextListId;
   #checker;
 }
-
-// Pedir signature para todo los accesos de modificación
-// Modificar bid id para que la signature quede con los argumentos de la función
-// TODO:  add best bid to list, when delete a bid checks if is the best bid, when adda a bid checks if its best bid
