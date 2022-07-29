@@ -44,14 +44,14 @@ test('Delete list: successfully', async () => {
   let res = await auctionManager.createList(ownerAddr, nftContractAddr, [tokenId], [minPrice], ownerSignature);
   expect(res.status).toBe('success');
 
-  res = await auctionManager.deletList(res.list.listId, ownerSignature);
+  res = await auctionManager.deleteList(res.list.listId, ownerSignature);
   expect(res.status).toBe('success');
 });
 
 test('Delete list: Invalid listId (error)', async () => {
   const auctionManager = new AuctionManager(checker);
 
-  const res = await auctionManager.deletList(1, ownerSignature);
+  const res = await auctionManager.deleteList(1, ownerSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('Invalid listId');
 });
@@ -98,7 +98,7 @@ test('Delete token: successfully', async () => {
   res = await auctionManager.addTokenToList(listId, nftContractAddr, 2, 10, ownerSignature);
   expect(res.status).toBe('success');
 
-  res = await auctionManager.deletToken(listId, 2, ownerSignature);
+  res = await auctionManager.deleteToken(listId, 2, ownerSignature);
   expect(res.status).toBe('success');
 });
 
@@ -112,11 +112,11 @@ test('Delete token: Invalid listId or tokenId', async () => {
   res = await auctionManager.addTokenToList(listId, nftContractAddr, 2, 10, ownerSignature);
   expect(res.status).toBe('success');
 
-  res = await auctionManager.deletToken(listId, 4, ownerSignature);
+  res = await auctionManager.deleteToken(listId, 4, ownerSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('Invalid listId or tokenId');
 
-  res = await auctionManager.deletToken(4, 2, ownerSignature);
+  res = await auctionManager.deleteToken(4, 2, ownerSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('Invalid listId or tokenId');
 });
@@ -219,7 +219,7 @@ test('Delete bid: successfully', async () => {
   expect(res.status).toBe('success');
   expect(res.message).toBe('Bid added');
 
-  res = await auctionManager.deletBid(listId, tokenId, bidderAddr, bidderSignature);
+  res = await auctionManager.deleteBid(listId, tokenId, bidderAddr, bidderSignature);
   expect(res.status).toBe('success');
 });
 
@@ -236,11 +236,11 @@ test('Delete bid: Invalid listId or TokenId (error)', async () => {
   expect(res.status).toBe('success');
   expect(res.message).toBe('Bid added');
 
-  res = await auctionManager.deletBid(listId, tokenId + 1, bidderAddr, bidderSignature);
+  res = await auctionManager.deleteBid(listId, tokenId + 1, bidderAddr, bidderSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('Invalid listId or TokenId');
 
-  res = await auctionManager.deletBid(listId + 1, tokenId, bidderAddr, bidderSignature);
+  res = await auctionManager.deleteBid(listId + 1, tokenId, bidderAddr, bidderSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('Invalid listId or TokenId');
 });
@@ -259,11 +259,11 @@ test('Delete bid: No bid found with bidderAddr and tokenId (error)', async () =>
   expect(res.status).toBe('success');
   expect(res.message).toBe('Bid added');
 
-  res = await auctionManager.deletBid(listId, tokenId, bidderAddr + 1, bidderSignature);
+  res = await auctionManager.deleteBid(listId, tokenId, bidderAddr + 1, bidderSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('No bid found with that bidderAddr and tokenId');
 
-  res = await auctionManager.deletBid(listId, tokenId + 1, bidderAddr, bidderSignature);
+  res = await auctionManager.deleteBid(listId, tokenId + 1, bidderAddr, bidderSignature);
   expect(res.status).toBe('error');
   expect(res.message).toBe('No bid found with that bidderAddr and tokenId');
 });

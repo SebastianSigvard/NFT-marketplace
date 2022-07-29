@@ -21,7 +21,7 @@ export default class AuctionManager {
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async createList(ownerAddr, nftContractAddr, tokenIds, minPrices, ownerSignature) {
+  createList(ownerAddr, nftContractAddr, tokenIds, minPrices, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     const listsArray = Object.values(this.#lists);
@@ -32,25 +32,23 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(ownerAddr)) {
+    if (! this.#checker.isValidAddr(ownerAddr)) {
       ret.status = 'error';
       ret.message = 'Owner Address is not valid';
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(nftContractAddr)) {
+    if (! this.#checker.isValidAddr(nftContractAddr)) {
       ret.status = 'error';
       ret.message = 'nftContractAddr Address is not valid';
       return ret;
     }
 
-    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+    if (! this.#checker.isSignatureValid(ownerSignature, ownerAddr,
         ownerAddr,
-        nftContractAddr,
-        tokenIds,
-        minPrices)) {
+        nftContractAddr)) {
       ret.status = 'error';
-      ret.message = 'Invalid Owner Signature';
+      ret.message = 'Invalid Owner Signature, please sign only ownerAddr, nftContractAddr arguments';
       return ret;
     }
 
@@ -77,7 +75,7 @@ export default class AuctionManager {
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async deletList(listId, ownerSignature) {
+  deleteList(listId, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     if (! this.#lists[listId]) {
@@ -88,7 +86,7 @@ export default class AuctionManager {
 
     const {ownerAddr} = this.#lists[listId];
 
-    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+    if (! this.#checker.isSignatureValid(ownerSignature, ownerAddr,
         listId)) {
       ret.status = 'error';
       ret.message = 'Invalid Owner Signature';
@@ -107,7 +105,7 @@ export default class AuctionManager {
  * @return {Object} All lists.
  */
   getLists() {
-    return {...this.listId};
+    return Object.values(this.#lists);
   }
 
   /**
@@ -128,7 +126,7 @@ export default class AuctionManager {
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async addTokenToList(listId, nftContractAddr, tokenId, minPrice, ownerSignature) {
+  addTokenToList(listId, nftContractAddr, tokenId, minPrice, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     if (! this.#lists[listId]) {
@@ -139,7 +137,7 @@ export default class AuctionManager {
 
     const {ownerAddr} = this.#lists[listId];
 
-    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+    if (! this.#checker.isSignatureValid(ownerSignature, ownerAddr,
         listId,
         nftContractAddr,
         tokenId,
@@ -149,13 +147,13 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(ownerAddr)) {
+    if (! this.#checker.isValidAddr(ownerAddr)) {
       ret.status = 'error';
       ret.message = 'Owner Address is not valid';
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(nftContractAddr)) {
+    if (! this.#checker.isValidAddr(nftContractAddr)) {
       ret.status = 'error';
       ret.message = 'nftContractAddr Address is not valid';
       return ret;
@@ -178,11 +176,11 @@ export default class AuctionManager {
   /**
  * Deletes a token from an auction list.
  * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids to be deleted.
+ * @param {Number} tokenId Tokens ids to be deleted.
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async deletToken(listId, tokenId, ownerSignature) {
+  deleteToken(listId, tokenId, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
@@ -195,7 +193,7 @@ export default class AuctionManager {
 
     const {ownerAddr} = this.#lists[listId];
 
-    if (! await this.#checker.isSignatureValid(ownerSignature, ownerAddr,
+    if (! this.#checker.isSignatureValid(ownerSignature, ownerAddr,
         listId,
         tokenId)) {
       ret.status = 'error';
@@ -215,7 +213,7 @@ export default class AuctionManager {
   /**
  * Get information of specific token.
  * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids.
+ * @param {Number} tokenId Token id.
  * @return {Object} Info of token.
  */
   getToken(listId, tokenId) {
@@ -255,13 +253,13 @@ export default class AuctionManager {
  * @param {String} ownerAddr Address of nft's owner.
  * @param {String} bidderAddr Address of bidder.
  * @param {String} nftContractAddr Address of nft collection.
- * @param {Array}  tokenId Tokens ids.
+ * @param {Number} tokenId Token id.
  * @param {String} erc20ContractAddr Address of ERC20 contract.
  * @param {Number} erc20amount Amount of ERC20 token.
  * @param {String} bidderSignature Bidder signature of message.
  * @return {Object} Status object.
  */
-  async addBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
+  addBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     const listsArray = Object.values(this.#lists);
@@ -290,19 +288,19 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(bidderAddr)) {
+    if (! this.#checker.isValidAddr(bidderAddr)) {
       ret.status = 'error';
       ret.message = 'Bidder address is not valid';
       return ret;
     }
 
-    if (! await this.#checker.isValidAddr(erc20ContractAddr)) {
+    if (! this.#checker.isValidAddr(erc20ContractAddr)) {
       ret.status = 'error';
       ret.message = 'ERC20 contract address is not valid';
       return ret;
     }
 
-    if (! await this.#checker.isSignatureValid(bidderSignature, bidderAddr,
+    if (! this.#checker.isSignatureValid(bidderSignature, bidderAddr,
         ownerAddr,
         bidderAddr,
         nftContractAddr,
@@ -347,12 +345,12 @@ export default class AuctionManager {
   /**
  * Deletes a bid from a token from an auction list.
  * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids to be deleted.
+ * @param {Number} tokenId Token id to be deleted.
  * @param {String} bidderAddr Address of bidder.
  * @param {String} bidderSignature Bidder signature of message.
  * @return {Boolean} true or false if listId existed and tokenId too.
  */
-  async deletBid(listId, tokenId, bidderAddr, bidderSignature) {
+  deleteBid(listId, tokenId, bidderAddr, bidderSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     if (! this.#lists[listId]?.tokenIds.includes(tokenId)) {
@@ -371,7 +369,7 @@ export default class AuctionManager {
       return ret;
     }
 
-    if (! await this.#checker.isSignatureValid(bidderSignature, bidderAddr,
+    if (! this.#checker.isSignatureValid(bidderSignature, bidderAddr,
         listId,
         tokenId,
         bidderAddr)) {
@@ -392,13 +390,13 @@ export default class AuctionManager {
  * @param {String} ownerAddr Address of nft's owner.
  * @param {String} bidderAddr Address of bidder.
  * @param {String} nftContractAddr Address of nft collection.
- * @param {Array}  tokenId Tokens ids.
+ * @param {Number} tokenId Token id.
  * @param {String} erc20ContractAddr Address of ERC20 contract.
  * @param {Number} erc20amount Amount of ERC20 token.
  * @param {String} ownerSignature Signautre of owner.
  * @return {Object} Status object.
  */
-  async approveBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, ownerSignature) {
+  approveBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, ownerSignature) {
     const ret = {status: 'error', message: 'default error'};
 
     const listsArray = Object.values(this.#lists);
@@ -413,7 +411,7 @@ export default class AuctionManager {
       return ret;
     };
 
-    if (! await this.#checker.isSignatureValid(ownerSignature, bidderAddr,
+    if (! this.#checker.isSignatureValid(ownerSignature, ownerAddr,
         ownerAddr,
         bidderAddr,
         nftContractAddr,
@@ -421,7 +419,7 @@ export default class AuctionManager {
         erc20ContractAddr,
         erc20amount)) {
       ret.status = 'error';
-      ret.message = 'Invalid Bidder Signature';
+      ret.message = 'Invalid owner Signature';
       return ret;
     }
 
@@ -463,11 +461,11 @@ export default class AuctionManager {
   /**
  * Deletes a token without signature of owner.
  * @param {Number} listId Id of list.
- * @param {Array}  tokenId Tokens ids to be deleted.
+ * @param {Number} tokenId Token id to be deleted.
  * @param {String} bidderAddr Address of bidder.
  * @return {Object} Status object.
 */
-  async getApprovedBid(listId, tokenId, bidderAddr) {
+  getApprovedBid(listId, tokenId, bidderAddr) {
     const ret = {status: 'error', message: 'default error'};
 
     if (! this.#lists[listId]) {
@@ -509,6 +507,31 @@ export default class AuctionManager {
     };
 
     return ret;
+  }
+
+
+  /**
+ * Deletes a token without permission.
+ * @param {String} ownerAddr Address of nft's owner.
+ * @param {String} nftContractAddr Address of nft collection.
+ * @param {Number} tokenId Tokens id.
+ */
+  localDeleteToken(ownerAddr, nftContractAddr, tokenId) {
+    const listsArray = Object.values(this.#lists);
+
+    const list = listsArray.find( (list) => list.nftContractAddr === nftContractAddr && list.ownerAddr === ownerAddr);
+
+    if (!list) return;
+
+    const listId = list.listId;
+
+    const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
+
+    if (idx === -1 || ! idx) return;
+
+    this.#lists[listId].tokenIds.splice(idx, 1);
+    this.#lists[listId].minPrices.splice(idx, 1);
+    this.#lists[listId].bids = this.#lists[listId].bids.map((bid) => bid.tokenId !== tokenId);
   }
 
   #lists;
