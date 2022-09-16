@@ -1,6 +1,13 @@
 # NFT_Marketplace
-Cheap NFT Marketplace 
-
+An on-off-chain system that permit cheap NFT ERC20 transactions:
+![image](https://user-images.githubusercontent.com/83707961/190624147-4f6f8a30-ad9e-4a42-a1d2-fc4a64b107a3.png)
+1) Owner of the NFT approves all NFT’s to the Marketplace
+2) Owner of the NFT signs to create an off-chain auction listing with a minimum price
+3) Bidder approves ERC20 tokens to Marketplace
+4) Bidder signs a bid for the auction
+5) If owner approves the bid, signs it back and retrieve to bidder
+6) Anyone with both signatures can settle the transaction
+7) The owner takes the ERC20 whilst the bidder takes the NFT.
 ## ON-CHAIN
 ### TEST
 To test contracts please run:
