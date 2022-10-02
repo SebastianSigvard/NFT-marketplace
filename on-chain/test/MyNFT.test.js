@@ -6,7 +6,7 @@ contract('MyNFT', (accounts) => {
         const myNftInstance = await myNft.new();
   
         const name = await myNftInstance.name();
-        assert.equal(name.toString(), 'MyNFT', 'The nft collection name is wrong.');
+        assert.equal(name.toString(), 'TestNFT', 'The nft collection name is wrong.');
       });
 
       it('Symbol of nft connection', async () => {
