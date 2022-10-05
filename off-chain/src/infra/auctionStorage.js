@@ -1,8 +1,9 @@
+import AuctionStorageInterface from './auctionStorageInterface';
+
 /**
- * Abstract class for Auction Storage Interface definition for
- * Auction manager.
+ * Implementation of an Auction Storage following Interface definition.
  */
-export default class AuctionStorageInterface {
+class AuctionStorage extends AuctionStorageInterface {
   /**
      * Creates a new auction list
     * @param {String} ownerAddr Address of nft's owner.
@@ -12,8 +13,31 @@ export default class AuctionStorageInterface {
     * @return {Object} Object with status (bool), on succes list id, on error message.
     */
   createList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    const ret = {status: false, message: 'default error'};
+
+    const listsArray = Object.values(this.#lists);
+
+    if (listsArray.find((list) => list.ownerAddr === ownerAddr && list.nftContractAddr === nftContractAddr)) {
+      ret.status = false;
+      ret.message = 'List already created, please add tokens individually';
+      return ret;
+    }
+
+    const list = {
+      listId: this.#nextListId++,
+      ownerAddr,
+      nftContractAddr,
+      tokenIds,
+      minPrices,
+      bids: [],
+    };
+
+    this.#lists[list.listId] = list;
+
+    ret.status = true;
+    ret.list = {...list};
+    ret.message = 'Auction list successfully added to Market';
+    return ret;
   }
 
   /**
@@ -22,8 +46,19 @@ export default class AuctionStorageInterface {
     * @return {Object} Object with status (bool), on error message.
     */
   deleteList(listId) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    delete this.#lists[listId];
+
+    ret.status = true;
+    ret.message = 'List deleted';
+    return ret;
   }
 
   /**
@@ -32,8 +67,7 @@ export default class AuctionStorageInterface {
     * @return {Object} Requested list, on error undefined.
     */
   getList(listId) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    return this.#lists[listId];
   }
 
   /**
@@ -41,8 +75,7 @@ export default class AuctionStorageInterface {
     * @return {Object} All lists.
     */
   getLists() {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    return Object.values(this.#lists);
   }
 
   /**
@@ -54,8 +87,26 @@ export default class AuctionStorageInterface {
     * @return {Object} Object with status (bool), on error message.
     */
   addToken(listId, nftContractAddr, tokenId, minPrice) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    if (this.#lists[listId].tokenIds.includes(tokenId)) {
+      ret.status = false;
+      ret.message = `The tokenId[${tokenId}] it's allready inside auction list`;
+      return ret;
+    }
+
+    this.#lists[listId].tokenIds.push(tokenId);
+    this.#lists[listId].minPrices.push(minPrice);
+
+    ret.status = true;
+    ret.message = 'Token added to list';
+    return ret;
   }
 
   /**
@@ -65,8 +116,23 @@ export default class AuctionStorageInterface {
     * @return {Object} Object with status (bool), on error message.
     */
   deleteToken(listId, tokenId) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    const ret = {status: false, message: 'default error'};
+
+    const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
+
+    if (idx === -1 || ! idx) {
+      ret.status = false;
+      ret.message = 'Invalid listId or tokenId';
+      return ret;
+    }
+
+    this.#lists[listId].tokenIds.splice(idx, 1);
+    this.#lists[listId].minPrices.splice(idx, 1);
+    this.#lists[listId].bids = this.#lists[listId].bids.map((bid) => bid.tokenId !== tokenId);
+
+    ret.status = true;
+    ret.message = 'Token deleted';
+    return ret;
   }
 
   /**
@@ -95,4 +161,9 @@ export default class AuctionStorageInterface {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};
   }
+
+  #lists;
+  #nextListId;
 }
+
+export default new AuctionStorage();
