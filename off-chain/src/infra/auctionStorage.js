@@ -1,11 +1,21 @@
-import AuctionStorageInterface from './auctionStorageInterface';
+import {AuctionStorageInterface} from './auctionStorageInterface';
 
 /**
  * Implementation of an Auction Storage following Interface definition.
  */
-class AuctionStorage extends AuctionStorageInterface {
+export class AuctionStorage extends AuctionStorageInterface {
   /**
-     * Creates a new auction list
+    * AuctionStorage constructor.
+    */
+  constructor() {
+    super();
+
+    this.#lists = {};
+    this.#nextListId = 0;
+  }
+
+  /**
+    * Creates a new auction list
     * @param {String} ownerAddr Address of nft's owner.
     * @param {String} nftContractAddr Address of nft collection.
     * @param {Array}  tokenIds Tokens ids to put on auction.
@@ -71,7 +81,7 @@ class AuctionStorage extends AuctionStorageInterface {
     * @return {Object} Requested list, on error undefined.
     */
   getList(listId) {
-    return this.#lists[listId];
+    return {...this.#lists[listId]};
   }
 
   /**
@@ -170,7 +180,7 @@ class AuctionStorage extends AuctionStorageInterface {
     }
 
     ret.status = true;
-    ret.message = 'Success';
+    ret.message = true;
     ret.token = token;
     return ret;
   }
@@ -207,7 +217,13 @@ class AuctionStorage extends AuctionStorageInterface {
 
     let bid = bids.find( (bid) => bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
 
-    ret.status = 'success';
+    if (approval && !bid) {
+      ret.status = false;
+      ret.message = 'There is no bid with provided argumetns bidderAddr and tokenId';
+      return ret;
+    }
+
+    ret.status = true;
 
     if ( ! bid ) {
       bid = {
@@ -263,14 +279,14 @@ class AuctionStorage extends AuctionStorageInterface {
     });
 
     if (newBids.length === bids.length) {
-      ret.status = 'error';
+      ret.status = false;
       ret.message = 'No bid found with that bidderAddr and tokenId';
       return ret;
     }
 
     token.bids = newBids;
 
-    ret.status = 'success';
+    ret.status = true;
     ret.message = 'Bid deleted';
     return ret;
   }

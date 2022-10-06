@@ -39,7 +39,6 @@ test('Is signature valid: successfully', async () => {
 });
 
 test('Is signature valid: invalid', async () => {
-  console.log(ownerAddr, bidderAddr, nftContractAddr, 1, erc20ContractAddr, 20);
   const message = web3.utils.soliditySha3(ownerAddr, bidderAddr, nftContractAddr, 1, erc20ContractAddr, 20);
   const signatureOwner = await web3.eth.sign(message, ownerAddr);
 

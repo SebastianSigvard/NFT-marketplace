@@ -2,7 +2,7 @@
  * Abstract class for Auction Storage Interface definition for
  * Auction manager.
  */
-export default class AuctionStorageInterface {
+export class AuctionStorageInterface {
   /**
      * Creates a new auction list
     * @param {String} ownerAddr Address of nft's owner.
@@ -121,3 +121,5 @@ export default class AuctionStorageInterface {
     return {};
   }
 }
+
+export default new AuctionStorageInterface();
