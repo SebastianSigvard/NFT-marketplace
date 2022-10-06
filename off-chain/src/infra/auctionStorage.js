@@ -10,9 +10,9 @@ class AuctionStorage extends AuctionStorageInterface {
     * @param {String} nftContractAddr Address of nft collection.
     * @param {Array}  tokenIds Tokens ids to put on auction.
     * @param {Array}  minPrices Minimum price of each token.
-    * @return {Object} Object with status (bool), on succes list id, on error message.
+    * @return {Object} Object with status (bool), on succes list, on error message.
     */
-  createList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
+  addList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
     const ret = {status: false, message: 'default error'};
 
     const listsArray = Object.values(this.#lists);
@@ -23,13 +23,17 @@ class AuctionStorage extends AuctionStorageInterface {
       return ret;
     }
 
+    const tokens = tokenIds.map( (tokenId, idx) => ({
+      id: tokenId,
+      minPrice: minPrices[idx],
+      bids: [],
+    }));
+
     const list = {
       listId: this.#nextListId++,
       ownerAddr,
       nftContractAddr,
-      tokenIds,
-      minPrices,
-      bids: [],
+      tokens,
     };
 
     this.#lists[list.listId] = list;
@@ -95,14 +99,17 @@ class AuctionStorage extends AuctionStorageInterface {
       return ret;
     }
 
-    if (this.#lists[listId].tokenIds.includes(tokenId)) {
+    if (this.#lists[listId].tokens.find( (token) => token.id === tokenId)) {
       ret.status = false;
       ret.message = `The tokenId[${tokenId}] it's allready inside auction list`;
       return ret;
     }
 
-    this.#lists[listId].tokenIds.push(tokenId);
-    this.#lists[listId].minPrices.push(minPrice);
+    this.#lists[listId].tokens.push({
+      id: tokenId,
+      minPrice: minPrice,
+      bids: [],
+    });
 
     ret.status = true;
     ret.message = 'Token added to list';
@@ -118,17 +125,22 @@ class AuctionStorage extends AuctionStorageInterface {
   deleteToken(listId, tokenId) {
     const ret = {status: false, message: 'default error'};
 
-    const idx = this.#lists[listId]?.tokenIds.indexOf(tokenId);
-
-    if (idx === -1 || ! idx) {
+    if (! this.#lists[listId]) {
       ret.status = false;
-      ret.message = 'Invalid listId or tokenId';
+      ret.message = 'Invalid listId';
       return ret;
     }
 
-    this.#lists[listId].tokenIds.splice(idx, 1);
-    this.#lists[listId].minPrices.splice(idx, 1);
-    this.#lists[listId].bids = this.#lists[listId].bids.map((bid) => bid.tokenId !== tokenId);
+    const token = this.#lists[listId].tokens.find( (token) => token.id === tokenId);
+    if (! token) {
+      ret.status = false;
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+
+    const idx = this.#lists[listId]?.tokens.indexOf(token);
+
+    this.#lists[listId].tokens.splice(idx, 1);
 
     ret.status = true;
     ret.message = 'Token deleted';
@@ -136,30 +148,167 @@ class AuctionStorage extends AuctionStorageInterface {
   }
 
   /**
-     *
+    * Returns solicited token.
+    * @param {Number} listId Id of list.
+    * @param {Number} tokenId Tokens ids to be deleted.
+    * @return {Object} Object with status (bool), on succes token, on error message.
+    */
+  getToken(listId, tokenId) {
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const token = this.#lists[listId].tokens.find( (token) => token.id === tokenId);
+    if (! token) {
+      ret.status = false;
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+
+    ret.status = true;
+    ret.message = 'Success';
+    ret.token = token;
+    return ret;
+  }
+
+  /**
+     * Adds or updates bid
     * @param {Number} listId Id of list.
     * @param {Number} tokenId Tokens ids to be deleted.
     * @param {String} bidderAddr Address of bidder.
     * @param {String} erc20ContractAddr Address of ERC20 contract.
     * @param {Number} erc20amount Amount of ERC20 token.
     * @param {String} bidderSignature Bidder signature of auction.
+    * @param {String} ownerSignature Bidder signature of auction.
+    * @param {String} approval Bidder signature of auction.
     * @return {Object} Object with status (bool), on error message.
     */
-  addBid(listId, tokenId, bidderAddr, erc20ContractAddr, erc20amount, bidderSignature) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+  addBid(listId, tokenId, bidderAddr, erc20ContractAddr, erc20amount,
+      bidderSignature, ownerSignature = undefined, approval = false) {
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const token = this.#lists[listId].tokens.find( (token) => token.id === tokenId);
+    if (! token) {
+      ret.status = false;
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+    const {bids} = token;
+
+    let bid = bids.find( (bid) => bid.bidderAddr === bidderAddr && bid.tokenId === tokenId);
+
+    ret.status = 'success';
+
+    if ( ! bid ) {
+      bid = {
+        bidderAddr,
+        tokenId,
+        erc20ContractAddr,
+        erc20amount,
+        ownerSignature: undefined,
+        bidderSignature,
+        approval: false,
+      };
+
+      bids.push(bid);
+
+      ret.message = 'Bid added';
+      return ret;
+    }
+
+    bid.erc20amount = erc20amount;
+    bid.bidderSignature = bidderSignature;
+    bid.ownerSignature = ownerSignature;
+    bid.approval = approval;
+
+    ret.message = 'Bid updated';
+    return ret;
   }
 
-  /** Adds a bid to a specific token id of a specific auction list.
-    * Deletes a bid from a token from an auction list.
+  /** Deletes a bid from a token from an auction list.
     * @param {Number} listId Id of list.
     * @param {Number} tokenId Token id to be deleted.
     * @param {String} bidderAddr Address of bidder.
     * @return {Object} Object with status (bool), on error message.
     */
   deleteBid(listId, tokenId, bidderAddr) {
-    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
-    return {};
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const token = this.#lists[listId].tokens.find( (token) => token.id === tokenId);
+    if (! token) {
+      ret.status = false;
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+    const {bids} = token;
+
+    const newBids = bids.filter((bid) => {
+      return !( bid.tokenId === tokenId && bid.bidderAddr === bidderAddr);
+    });
+
+    if (newBids.length === bids.length) {
+      ret.status = 'error';
+      ret.message = 'No bid found with that bidderAddr and tokenId';
+      return ret;
+    }
+
+    token.bids = newBids;
+
+    ret.status = 'success';
+    ret.message = 'Bid deleted';
+    return ret;
+  }
+
+  /** Get bid
+    * @param {Number} listId Id of list.
+    * @param {Number} tokenId Token id to be deleted.
+    * @param {String} bidderAddr Address of bidder.
+    * @return {Object} Object with status (bool),on succes bid, on error message.
+    */
+  getBid(listId, tokenId, bidderAddr) {
+    const ret = {status: false, message: 'default error'};
+
+    if (! this.#lists[listId]) {
+      ret.status = false;
+      ret.message = 'Invalid listId';
+      return ret;
+    }
+
+    const token = this.#lists[listId].tokens.find( (token) => token.id === tokenId);
+    if (! token) {
+      ret.status = false;
+      ret.message = 'Invalid tokenId';
+      return ret;
+    }
+    const {bids} = token;
+
+    const bid = bids.find((bid) => bid.bidderAddr === bidderAddr);
+    if (! bid) {
+      ret.status = false;
+      ret.message = 'Not bid found with that bidderAddr';
+      return ret;
+    }
+
+    ret.status = true;
+    ret.message = 'Bid found';
+    ret.bid = bid;
+    return ret;
   }
 
   #lists;

@@ -9,9 +9,9 @@ export default class AuctionStorageInterface {
     * @param {String} nftContractAddr Address of nft collection.
     * @param {Array}  tokenIds Tokens ids to put on auction.
     * @param {Array}  minPrices Minimum price of each token.
-    * @return {Object} Object with status (bool), on succes list id, on error message.
+    * @return {Object} Object with status (bool), on succes list, on error message.
     */
-  createList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
+  addList(ownerAddr, nftContractAddr, tokenIds, minPrices) {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};
   }
@@ -70,16 +70,30 @@ export default class AuctionStorageInterface {
   }
 
   /**
-     *
+    * Returns solicited token.
+    * @param {Number} listId Id of list.
+    * @param {Number} tokenId Tokens ids to be deleted.
+    * @return {Object} Object with status (bool), on succes token, on error message.
+    */
+  getToken(listId, tokenId) {
+    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
+    return {};
+  }
+
+  /**
+     * Adds or updates bid
     * @param {Number} listId Id of list.
     * @param {Number} tokenId Tokens ids to be deleted.
     * @param {String} bidderAddr Address of bidder.
     * @param {String} erc20ContractAddr Address of ERC20 contract.
     * @param {Number} erc20amount Amount of ERC20 token.
     * @param {String} bidderSignature Bidder signature of auction.
+    * @param {String} ownerSignature Bidder signature of auction.
+    * @param {String} approval Bidder signature of auction.
     * @return {Object} Object with status (bool), on error message.
     */
-  addBid(listId, tokenId, bidderAddr, erc20ContractAddr, erc20amount, bidderSignature) {
+  addBid(listId, tokenId, bidderAddr, erc20ContractAddr, erc20amount,
+      bidderSignature, ownerSignature = undefined, approval = false) {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};
   }
@@ -92,6 +106,17 @@ export default class AuctionStorageInterface {
     * @return {Object} Object with status (bool), on error message.
     */
   deleteBid(listId, tokenId, bidderAddr) {
+    throw new Error('No implementation of AuctionStorageInterface virtual fun.');
+    return {};
+  }
+
+  /** Get bid
+    * @param {Number} listId Id of list.
+    * @param {Number} tokenId Token id to be deleted.
+    * @param {String} bidderAddr Address of bidder.
+    * @return {Object} Object with status (bool),on succes bid, on error message.
+    */
+  getBid(listId, tokenId, bidderAddr) {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};
   }
