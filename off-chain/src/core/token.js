@@ -4,7 +4,7 @@ export class Token {
     constructor(options) {
         this.#tokenId = options.tokenId;
         this.#minPrice = options.minPrice;
-        this.#bids = options.bids;
+        this.#bids = [];
     }
 
     #tokenId;
