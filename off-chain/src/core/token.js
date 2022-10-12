@@ -1,24 +1,47 @@
-import tokenValidatorInterface, {TokenValidatorInterface} from './token-interface.js'
+import Bid from './bid.js';
 
 export class Token {
-    constructor(options) {
-        this.#tokenId = options.tokenId;
-        this.#minPrice = options.minPrice;
-        this.#bids = [];
+  constructor(options) {
+    this.#tokenId = options.tokenId;
+    this.#minPrice = options.minPrice;
+    this.#bids = [];
+  }
+
+  addBid(bid) {
+    if (! (Object.getPrototypeOf(bid) instanceof Bid)) {
+      throw Error('bid must be instance of Bid');
     }
 
-    #tokenId;
-    #minPrice;
-    #bids;
+    this.#bids.push(bid);
+  }
+
+  getId() { return this.#tokenId };
+
+  getMinPrice() { return this.#tokenId };
+
+  #tokenId;
+  #minPrice;
+  #bids;
 }
 
 export default class TokenFactory {
-    constructor(tokenValidator) {
-        if (! (Object.getPrototypeOf(tokenValidator) instanceof TokenValidatorInterface))
-            throw Error('tokenValidator must be instance of TokenValidatorInterface');
-
-        this.#tokenValidator = tokenValidator;
+  createToken(tokenId, minPrice) {
+    if (Number.isNaN(tokenId)) {
+      throw Error(tokenId + ' tokenId is not a number');
     }
 
-    #tokenValidator;
+    if (tokenId < 0) {
+      throw Error(tokenId + ' tokenId must be greater than 0');
+    }
+
+    if (Number.isNaN(minPrice)) {
+      throw Error(minPrice + ' minPrice is not a number');
+    }
+
+    if (minPrice < 0) {
+      throw Error(minPrice + ' minPrice must be greater than 0');
+    }
+
+    return new Token({tokenId, minPrice});
+  }
 }
