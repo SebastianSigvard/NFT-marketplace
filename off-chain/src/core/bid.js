@@ -80,7 +80,7 @@ export default class BidFactory {
       throw Error(nftContractAddr + ' is not a valid nft contract address');
     }
 
-    if (Number.isNaN(tokenId)) {
+    if (typeof tokenId !== 'number') {
       throw Error(tokenId + ' tokenId is not a number');
     }
 
@@ -92,12 +92,12 @@ export default class BidFactory {
       throw Error(erc20ContractAddr + ' is not a valid erc20 contract address');
     }
 
-    if (Number.isNaN(erc20amount)) {
-      throw Error(erc20amount + ' erc20mount is not a number');
+    if (typeof erc20amount!== 'number') {
+      throw Error(erc20amount + ' erc20amount is not a number');
     }
 
     if (erc20amount <= 0 ) {
-      throw Error(erc20amount + ' erc20mount is not a grater than 0');
+      throw Error(erc20amount + ' erc20amount is not greater than 0');
     }
 
     if (! this.#validator.isSignatureValid(bidderSignature, bidderAddr,

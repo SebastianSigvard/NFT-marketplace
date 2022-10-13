@@ -20,4 +20,4 @@ export class ValidatorInterface {
   }
 }
 
-export default new ListValidatorInterface();
+export default new ValidatorInterface();
