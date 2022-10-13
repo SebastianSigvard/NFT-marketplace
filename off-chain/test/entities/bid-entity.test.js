@@ -1,5 +1,5 @@
-import ValidatorMock from './validator_mock.js';
-import BidFactory from '../src/core/bid.js';
+import ValidatorMock from '../validator_mock.js';
+import BidFactory from '../../src/core/entities/bid.js';
 
 const validatorMock = new ValidatorMock();
 const bidFactory = new BidFactory(validatorMock);
