@@ -15,9 +15,23 @@ export class Token {
     this.#bids.push(bid);
   }
 
-  getId() { return this.#tokenId };
+  deleteBid(bidderAddr) {
+    const idx = this.#bids.findIndex((bid) => bid.getBidderAddr() === bidderAddr);
 
-  getMinPrice() { return this.#tokenId };
+    if (idx < 0) {
+      throw Error('bidId not found');
+    }
+
+    this.#bids.splice(idx, 1);
+  }
+
+  getId() {
+    return this.#tokenId;
+  };
+
+  getMinPrice() {
+    return this.#tokenId;
+  };
 
   #tokenId;
   #minPrice;

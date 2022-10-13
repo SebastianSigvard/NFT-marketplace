@@ -1,4 +1,4 @@
-import listValidatorInterface, {ListValidatorInterface} from './list-validator-interface.js';
+import validatorInterface, {ValidatorInterface} from './validator-interface.js';
 import Token from './token.js';
 
 class AuctionList {
@@ -19,6 +19,10 @@ class AuctionList {
     }
 
     this.#tokens.push(token);
+  }
+
+  getToken(tokenId) {
+    return this.#tokens.find((token) => token.getId === tokenId);
   }
 
   deleteToken(tokenId) {
@@ -54,12 +58,12 @@ class AuctionList {
 }
 
 export default class AuctionListFactory {
-  constructor(listValidator = listValidatorInterface) {
-    if (! (Object.getPrototypeOf(listValidator) instanceof ListValidatorInterface)) {
-      throw Error('listValidator must be instance of ListValidatorInterface');
+  constructor(validator = validatorInterface) {
+    if (! (Object.getPrototypeOf(validator) instanceof ValidatorInterface)) {
+      throw Error('validator must be instance of ValidatorInterface');
     }
 
-    this.#listValidator = listValidator;
+    this.#validator = validator;
   }
 
   createList(listId, ownerAddr, nftContractAddr, tokens) {
@@ -67,11 +71,11 @@ export default class AuctionListFactory {
       throw Error(listId + ' is not a number');
     }
 
-    if (! this.#listValidator.isValidAddr(ownerAddr)) {
+    if (! this.#validator.isValidAddr(ownerAddr)) {
       throw Error(ownerAddr + ' is not a valid address');
     }
 
-    if (! this.#listValidator.isValidNftContract(nftContractAddr)) {
+    if (! this.#validator.isValidNftContract(nftContractAddr)) {
       throw Error(nftContractAddr + ' is not a valid nft contract address');
     }
 
@@ -88,6 +92,6 @@ export default class AuctionListFactory {
     return new AuctionList({listId, ownerAddr, nftContractAddr, tokens});
   }
 
-  #listValidator;
+  #validator;
 }
 
