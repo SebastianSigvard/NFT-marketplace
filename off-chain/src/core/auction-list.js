@@ -21,10 +21,6 @@ class AuctionList {
     this.#tokens.push(token);
   }
 
-  getToken(tokenId) {
-    return this.#tokens.find((token) => token.getId === tokenId);
-  }
-
   deleteToken(tokenId) {
     const idx = this.#tokens.findIndex((token) => token.getId() === tokenId);
 
@@ -49,6 +45,10 @@ class AuctionList {
 
   getToken(tokenId) {
     return this.#tokens.find((token) => token.getId() === tokenId);
+  }
+
+  getTokens() {
+    return [...this.#tokens];
   }
 
   #listId;

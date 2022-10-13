@@ -12,6 +12,42 @@ export class Bid {
     this.#bidderSignature = bidderSignature;
   }
 
+  getOwnerAddr() {
+    return this.#ownerAddr;
+  }
+
+  getBidderAddr() {
+    return this.#ownerAddr;
+  }
+
+  getNftContractAddr() {
+    return this.#nftContractAddr;
+  }
+
+  getTokenId() {
+    return this.#tokenId;
+  }
+
+  getErc20ContractAddr() {
+    return this.#erc20ContractAddr;
+  }
+
+  getErc20Amount() {
+    return this.#erc20amount;
+  }
+
+  getOwnerSignature() {
+    return this.#ownerSignature
+  }
+
+  setOwnerSignature(ownerSignature) {
+    this.#ownerSignature = ownerSignature;
+  }
+
+  getBidderSignature() {
+    return this.#bidderSignature;
+  }
+
   #ownerAddr;
   #bidderAddr;
   #nftContractAddr;
@@ -60,21 +96,27 @@ export default class BidFactory {
       throw Error(erc20amount + ' erc20mount is not a number');
     }
 
-    if (erc20amount <= 0 ){
+    if (erc20amount <= 0 ) {
       throw Error(erc20amount + ' erc20mount is not a grater than 0');
     }
 
-    if(! this.#validator.isSignatureValid(bidderSignature, bidderAddr,
-      ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      tokenId,
-      erc20ContractAddr,
-      erc20amount) ) {
+    if (! this.#validator.isSignatureValid(bidderSignature, bidderAddr,
+        ownerAddr,
+        bidderAddr,
+        nftContractAddr,
+        tokenId,
+        erc20ContractAddr,
+        erc20amount) ) {
       throw Error('bidderSignature not valid');
     }
 
-    return new Bid(....
+    return new Bid(ownerAddr,
+        bidderAddr,
+        nftContractAddr,
+        tokenId,
+        erc20ContractAddr,
+        erc20amount,
+        bidderSignature);
   }
 
   #validator;
