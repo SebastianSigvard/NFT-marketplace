@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import ValidatorMock from '../validator_mock.js';
 import BidFactory from '../../src/core/entities/bid.js';
 
@@ -15,12 +16,12 @@ const ownerSignature = 'fakeOwnerSignature';
 
 test('Create Bid successfully', async () => {
   const bid = bidFactory.createBid(ownerAddr,
-    bidderAddr,
-    nftContractAddr,
-    tokenId,
-    erc20ContractAddr,
-    erc20amount,
-    bidderSignature)
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
+      bidderSignature);
 
   expect(bid.getOwnerAddr()).toBe(ownerAddr);
   expect(bid.getBidderAddr()).toBe(bidderAddr);
@@ -39,7 +40,7 @@ test('Create bidFactory fails for bad validator', async () => {
   try {
     const bF = new BidFactory('kk');
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('validator must be instance of ValidatorInterface');
   }
 });
@@ -47,14 +48,14 @@ test('Create bidFactory fails for bad validator', async () => {
 test('Create Bid fail for bad tokenId', async () => {
   try {
     const bid = bidFactory.createBid(ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      'a',
-      erc20ContractAddr,
-      erc20amount,
-      bidderSignature);
+        bidderAddr,
+        nftContractAddr,
+        'a',
+        erc20ContractAddr,
+        erc20amount,
+        bidderSignature);
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('a tokenId is not a number');
   }
 });
@@ -62,14 +63,14 @@ test('Create Bid fail for bad tokenId', async () => {
 test('Create Bid fail for negative tokenId', async () => {
   try {
     const bid = bidFactory.createBid(ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      -1,
-      erc20ContractAddr,
-      erc20amount,
-      bidderSignature);
+        bidderAddr,
+        nftContractAddr,
+        -1,
+        erc20ContractAddr,
+        erc20amount,
+        bidderSignature);
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('-1 tokenId must be greater than 0');
   }
 });
@@ -77,14 +78,14 @@ test('Create Bid fail for negative tokenId', async () => {
 test('Create Bid fail for negative tokenId', async () => {
   try {
     const bid = bidFactory.createBid(ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      -1,
-      erc20ContractAddr,
-      erc20amount,
-      bidderSignature);
+        bidderAddr,
+        nftContractAddr,
+        -1,
+        erc20ContractAddr,
+        erc20amount,
+        bidderSignature);
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('-1 tokenId must be greater than 0');
   }
 });
@@ -92,14 +93,14 @@ test('Create Bid fail for negative tokenId', async () => {
 test('Create Bid fail for bad erc20amount', async () => {
   try {
     const bid = bidFactory.createBid(ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      tokenId,
-      erc20ContractAddr,
-      'a',
-      bidderSignature);
+        bidderAddr,
+        nftContractAddr,
+        tokenId,
+        erc20ContractAddr,
+        'a',
+        bidderSignature);
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('a erc20amount is not a number');
   }
 });
@@ -107,14 +108,14 @@ test('Create Bid fail for bad erc20amount', async () => {
 test('Create Bid fail for negative erc20amount', async () => {
   try {
     const bid = bidFactory.createBid(ownerAddr,
-      bidderAddr,
-      nftContractAddr,
-      tokenId,
-      erc20ContractAddr,
-      -2,
-      bidderSignature);
+        bidderAddr,
+        nftContractAddr,
+        tokenId,
+        erc20ContractAddr,
+        -2,
+        bidderSignature);
     expect(true).toBe(false);
-  } catch(err) {
+  } catch (err) {
     expect(err.message).toBe('-2 erc20amount is not greater than 0');
   }
 });

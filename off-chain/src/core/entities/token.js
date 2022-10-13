@@ -19,11 +19,15 @@ export class Token {
     this.#bids.push(bid);
   }
 
+  getBid(bidderAddr) {
+    return this.#bids.find((bid) => bid.getBidderAddr() === bidderAddr);
+  }
+
   deleteBid(bidderAddr) {
     const idx = this.#bids.findIndex((bid) => bid.getBidderAddr() === bidderAddr);
 
     if (idx < 0) {
-      throw Error('bidId not found');
+      throw Error('bidderAddr not found');
     }
 
     this.#bids.splice(idx, 1);
@@ -34,7 +38,7 @@ export class Token {
   };
 
   getMinPrice() {
-    return this.#tokenId;
+    return this.#minPrice;
   };
 
   getBids() {
@@ -48,7 +52,7 @@ export class Token {
 
 export default class TokenFactory {
   createToken(tokenId, minPrice) {
-    if (Number.isNaN(tokenId)) {
+    if (typeof tokenId !== 'number') {
       throw Error(tokenId + ' tokenId is not a number');
     }
 
@@ -56,7 +60,7 @@ export default class TokenFactory {
       throw Error(tokenId + ' tokenId must be greater than 0');
     }
 
-    if (Number.isNaN(minPrice)) {
+    if (typeof minPrice !== 'number') {
       throw Error(minPrice + ' minPrice is not a number');
     }
 
