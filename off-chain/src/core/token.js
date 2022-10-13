@@ -12,7 +12,7 @@ export class Token {
       throw Error('bid must be instance of Bid');
     }
 
-    if(bid.getErc20Amount() < this.#minPrice) {
+    if (bid.getErc20Amount() < this.#minPrice) {
       throw Error('erc20Amount is less than minPrice');
     }
 

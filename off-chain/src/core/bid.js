@@ -37,7 +37,7 @@ export class Bid {
   }
 
   getOwnerSignature() {
-    return this.#ownerSignature
+    return this.#ownerSignature;
   }
 
   setOwnerSignature(ownerSignature) {
