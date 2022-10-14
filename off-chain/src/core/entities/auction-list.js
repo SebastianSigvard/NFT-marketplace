@@ -1,5 +1,5 @@
 import validatorInterface, {ValidatorInterface} from './validator-interface.js';
-import Token from './token.js';
+import {Token} from './token.js';
 
 class AuctionList {
   constructor(options) {
@@ -10,7 +10,7 @@ class AuctionList {
   }
 
   addToken(token) {
-    if (! (Object.getPrototypeOf(token) instanceof Token)) {
+    if (! (token instanceof Token)) {
       throw Error('token must be instance of Token');
     }
 
@@ -67,7 +67,7 @@ export default class AuctionListFactory {
   }
 
   createList(listId, ownerAddr, nftContractAddr, tokens) {
-    if (Number.isNaN(listId)) {
+    if (typeof listId !== 'number') {
       throw Error(listId + ' is not a number');
     }
 
@@ -84,7 +84,7 @@ export default class AuctionListFactory {
     }
 
     for (const token of tokens) {
-      if (! (Object.getPrototypeOf(token) instanceof Token)) {
+      if (! (token instanceof Token)) {
         throw Error('token must be instance of Token');
       }
     }
