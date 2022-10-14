@@ -18,7 +18,7 @@ export class Token {
 
     const idx = this.#bids.findIndex((_bid) => _bid.getBidderAddr() === bid.getBidderAddr() );
 
-    if( idx < 0) {
+    if ( idx < 0) {
       this.#bids.push(bid);
     } else {
       this.#bids[idx] = bid;
