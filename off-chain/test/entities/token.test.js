@@ -76,3 +76,35 @@ test('Create token successfully', async () => {
     expect(err.message).toBe('bidderAddr not found');
   }
 });
+
+test('Create token fail all throws', async () => {
+  try {
+    const token = tokenFactory.createToken('a', minPrice);
+    fail('fun must throw');
+  } catch(err) {
+    expect(err.message).toBe('a tokenId is not a number');
+  }
+
+  try {
+    const token = tokenFactory.createToken(-1, minPrice);
+    fail('fun must throw');
+  } catch(err) {
+    expect(err.message).toBe('-1 tokenId must be greater than 0');
+  }
+
+  try {
+    const token = tokenFactory.createToken(tokenId, 'a');
+    fail('fun must throw');
+  } catch(err) {
+    expect(err.message).toBe('a minPrice is not a number');
+  }
+
+  try {
+    const token = tokenFactory.createToken(tokenId, -1);
+    fail('fun must throw');
+  } catch(err) {
+    expect(err.message).toBe('-1 minPrice must be greater than 0');
+  }
+});
+
+
