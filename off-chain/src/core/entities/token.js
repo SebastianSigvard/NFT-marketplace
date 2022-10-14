@@ -1,4 +1,4 @@
-import Bid from './bid.js';
+import {Bid} from './bid.js';
 
 export class Token {
   constructor(options) {
@@ -8,15 +8,21 @@ export class Token {
   }
 
   addBid(bid) {
-    if (! (Object.getPrototypeOf(bid) instanceof Bid)) {
+    if (! (bid instanceof Bid)) {
       throw Error('bid must be instance of Bid');
     }
 
     if (bid.getErc20Amount() < this.#minPrice) {
-      throw Error('erc20Amount is less than minPrice');
+      throw Error('erc20amount is less than minPrice');
     }
 
-    this.#bids.push(bid);
+    const idx = this.#bids.findIndex((_bid) => _bid.getBidderAddr() === bid.getBidderAddr() );
+
+    if( idx < 0) {
+      this.#bids.push(bid);
+    } else {
+      this.#bids[idx] = bid;
+    }
   }
 
   getBid(bidderAddr) {
