@@ -1,7 +1,7 @@
 import validatorInterface, {ValidatorInterface} from './validator-interface.js';
 import {Token} from './token.js';
 
-class AuctionList {
+export class AuctionList {
   constructor(options) {
     this.#listId = options.listId;
     this.#ownerAddr = options.ownerAddr;

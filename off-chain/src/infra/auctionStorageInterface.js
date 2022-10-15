@@ -10,6 +10,7 @@ export class AuctionStorageInterface {
     return {};
   }
 
+  // Must checks that list is an instance of AuctionList
   updateList(list) {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};
