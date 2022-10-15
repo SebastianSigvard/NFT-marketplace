@@ -119,5 +119,20 @@ export default class BidFactory {
         bidderSignature);
   }
 
+  copyBid(bid) {
+    const bidCp = new Bid({ownerAddr: bid.getOwnerAddr(),
+      bidderAddr: bid.getBidderAddr(),
+      nftContractAddr: bid.getNftContractAddr(),
+      tokenId: bid.getTokenId(),
+      erc20ContractAddr: bid.getErc20ContractAddr(),
+      erc20amount: bid.getErc20Amount(),
+      bidderSignature: bid.getBidderSignature(),
+    });
+
+    bidCp.setOwnerSignature(bid.getOwnerSignature());
+
+    return bidCp;
+  }
+
   #validator;
 }

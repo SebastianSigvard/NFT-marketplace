@@ -1,5 +1,5 @@
 import validatorInterface, {ValidatorInterface} from './validator-interface.js';
-import {Token} from './token.js';
+import TokenFactory, {Token} from './token.js';
 
 export class AuctionList {
   constructor(options) {
@@ -68,6 +68,7 @@ export default class AuctionListFactory {
     }
 
     this.#validator = validator;
+    this.#tokenFactory = new TokenFactory(validator);
   }
 
   createList(listId, ownerAddr, nftContractAddr, tokens) {
@@ -96,6 +97,26 @@ export default class AuctionListFactory {
     return new AuctionList({listId, ownerAddr, nftContractAddr, tokens});
   }
 
+  copyList(list) {
+    if (! list instanceof AuctionList) {
+      throw Error('list is not an instance of AuctionList');
+    }
+
+    const tokens = [];
+
+    for (const token of list.getTokens()) {
+      tokens.push(this.#tokenFactory.copyToken(token));
+    }
+
+    return new AuctionList({
+      listId: list.getListId(),
+      ownerAddr: list.getOwnerAddr(),
+      nftContractAddr: list.getNftContractAddr(),
+      tokens,
+    });
+  }
+
   #validator;
+  #tokenFactory;
 }
 

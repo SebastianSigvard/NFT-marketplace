@@ -5,7 +5,7 @@ import BidFactory from '../../src/core/entities/bid.js';
 
 const validatorMock = new ValidatorMock();
 const bidFactory = new BidFactory(validatorMock);
-const tokenFactory = new TokenFactory();
+const tokenFactory = new TokenFactory(validatorMock);
 
 const minPrice = 10;
 const ownerAddr = 'fakeAddr';

@@ -1,4 +1,4 @@
-import {Bid} from './bid.js';
+import BidFactory, {Bid} from './bid.js';
 
 export class Token {
   constructor(options) {
@@ -63,6 +63,10 @@ export class Token {
 }
 
 export default class TokenFactory {
+  constructor(validator) {
+    this.#bidFactory = new BidFactory(validator);
+  }
+
   createToken(tokenId, minPrice) {
     if (typeof tokenId !== 'number') {
       throw Error(tokenId + ' tokenId is not a number');
@@ -82,4 +86,20 @@ export default class TokenFactory {
 
     return new Token({tokenId, minPrice});
   }
+
+  copyToken(token) {
+    if (! (token instanceof Token)) {
+      throw Error('token is not an instance of Token');
+    }
+
+    const tokenCp = new Token({tokenId: token.getId(), minPrice: token.getMinPrice()});
+
+    for (const bid of token.getBids()) {
+      tokenCp.addBid(this.#bidFactory.copyBid(bid));
+    }
+
+    return tokenCp;
+  }
+
+  #bidFactory;
 }

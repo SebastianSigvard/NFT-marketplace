@@ -6,7 +6,7 @@ import AuctionListFactory from '../../src/core/entities/auction-list.js';
 
 const validatorMock = new ValidatorMock();
 const bidFactory = new BidFactory(validatorMock);
-const tokenFactory = new TokenFactory();
+const tokenFactory = new TokenFactory(validatorMock);
 const auctionListFactory = new AuctionListFactory(validatorMock);
 
 const listId = 0;

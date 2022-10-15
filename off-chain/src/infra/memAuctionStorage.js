@@ -4,7 +4,7 @@ import ListFactory, {AuctionList} from '../core/entities/auction-list.js';
 /**
  * Implementation of an Auction Storage in RAM following Interface definition.
  */
-export class MemAuctionStorage extends AuctionStorageInterface {
+export default class MemAuctionStorage extends AuctionStorageInterface {
   /**
     * AuctionStorage constructor.
     * @param {Validator} validator an implementation of ValidatorInterfac
@@ -34,10 +34,12 @@ export class MemAuctionStorage extends AuctionStorageInterface {
     }
 
     const list = this.#listFactory.createList(this.#nextListId++, ownerAddr, nftContractAddr, tokens);
+    const listCp = this.#listFactory.copyList(list);
 
+    console.log(listCp.getListId());
     this.#lists[list.getListId()] = list;
 
-    return JSON.parse(JSON.stringify(list));
+    return listCp;
   }
 
   // Must checks that list is an instance of AuctionList
@@ -50,7 +52,9 @@ export class MemAuctionStorage extends AuctionStorageInterface {
       throw Error('no list with listId ' + list.getListId());
     }
 
-    this.#lists[list.getListId] = list;
+    const listCp = this.#listFactory.copyList(list);
+
+    this.#lists[listCp.getListId] = listCp;
   }
 
   deleteList(listId) {
@@ -64,18 +68,24 @@ export class MemAuctionStorage extends AuctionStorageInterface {
   // @return {AuctionList} Auction list.
   // must throw if not list found
   getList(listId) {
-    if (!this.#lists[listId]) {
+    const list = this.#lists[listId];
+
+    if (!list) {
       throw Error('no list with listId ' + list.getListId());
     }
 
-    return JSON.parse(JSON.stringify(pthis.#lists[listId]));
+    const listCp = this.#listFactory.copyList(list);
+
+    return listCp;
   }
 
   getLists() {
     const lists = [];
 
     for (const list of this.#lists) {
-      lists.push(JSON.parse(JSON.stringify(list)));
+      const listCp = this.#listFactory.copyList(list);
+
+      lists.push(listCp);
     }
 
     return lists;
@@ -85,6 +95,4 @@ export class MemAuctionStorage extends AuctionStorageInterface {
   #lists;
   #nextListId;
 }
-
-export default new AuctionStorage();
 
