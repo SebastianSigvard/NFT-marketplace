@@ -84,7 +84,28 @@ test('Create auctionList successfully', async () => {
   }
 });
 
+test('Create auctionList successfully', async () => {
+  const token1 = tokenFactory.createToken(tokenId, minPrice);
+  const token2 = tokenFactory.createToken(tokenId + 1, minPrice);
+  const token3 = tokenFactory.createToken(tokenId + 2, minPrice);
 
+  const auctionList = auctionListFactory.createList(
+      listId,
+      ownerAddr,
+      nftContractAddr,
+      [token1, token2],
+  );
+
+  const auctionListCp = auctionListFactory.copyList(auctionList);
+
+  expect(auctionListCp.getListId()).toBe(listId);
+  expect(auctionListCp.getOwnerAddr()).toBe(ownerAddr);
+  expect(auctionListCp.getNftContractAddr()).toBe(nftContractAddr);
+  expect(auctionListCp.getTokens()).toStrictEqual([token1, token2]);
+  expect(auctionListCp.getToken(tokenId)).toStrictEqual(token1);
+  expect(auctionListCp.getToken(tokenId + 1)).toStrictEqual(token2);
+
+});
 test('AuctionListFactory fail test throw', async () => {
   const token1 = tokenFactory.createToken(tokenId, minPrice);
   const token2 = tokenFactory.createToken(tokenId + 1, minPrice);

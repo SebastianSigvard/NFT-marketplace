@@ -1,15 +1,15 @@
 import validatorInterface, {ValidatorInterface} from './validator-interface.js';
 
 export class Bid {
-  constructor(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
-    this.#ownerAddr = ownerAddr;
-    this.#bidderAddr = bidderAddr;
-    this.#nftContractAddr = nftContractAddr;
-    this.#tokenId = tokenId;
-    this.#erc20ContractAddr = erc20ContractAddr;
-    this.#erc20amount = erc20amount;
+  constructor(options) {
+    this.#ownerAddr = options.ownerAddr;
+    this.#bidderAddr = options.bidderAddr;
+    this.#nftContractAddr = options.nftContractAddr;
+    this.#tokenId = options.tokenId;
+    this.#erc20ContractAddr = options.erc20ContractAddr;
+    this.#erc20amount = options.erc20amount;
     this.#ownerSignature = null;
-    this.#bidderSignature = bidderSignature;
+    this.#bidderSignature = options.bidderSignature;
   }
 
   getOwnerAddr() {
@@ -110,13 +110,13 @@ export default class BidFactory {
       throw Error('bidderSignature not valid');
     }
 
-    return new Bid(ownerAddr,
+    return new Bid({ownerAddr,
         bidderAddr,
         nftContractAddr,
         tokenId,
         erc20ContractAddr,
         erc20amount,
-        bidderSignature);
+        bidderSignature});
   }
 
   copyBid(bid) {

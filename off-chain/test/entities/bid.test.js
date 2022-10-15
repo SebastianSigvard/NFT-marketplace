@@ -36,6 +36,29 @@ test('Create Bid successfully', async () => {
   expect(bid.getOwnerSignature()).toBe(ownerSignature);
 });
 
+test('Create Bid copy successfully', async () => {
+  const bid = bidFactory.createBid(ownerAddr,
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
+      bidderSignature);
+
+  bid.setOwnerSignature(ownerSignature);
+
+  const bidCp = bidFactory.copyBid(bid);
+
+  expect(bidCp.getOwnerAddr()).toBe(ownerAddr);
+  expect(bidCp.getBidderAddr()).toBe(bidderAddr);
+  expect(bidCp.getNftContractAddr()).toBe(nftContractAddr);
+  expect(bidCp.getTokenId()).toBe(tokenId);
+  expect(bidCp.getErc20ContractAddr()).toBe(erc20ContractAddr);
+  expect(bidCp.getErc20Amount()).toBe(erc20amount);
+  expect(bidCp.getBidderSignature()).toBe(bidderSignature);
+  expect(bidCp.getOwnerSignature()).toBe(ownerSignature);
+});
+
 test('Create bidFactory fails for bad validator', async () => {
   try {
     const bF = new BidFactory('kk');

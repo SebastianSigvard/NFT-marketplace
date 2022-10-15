@@ -82,6 +82,18 @@ test('Create token successfully', async () => {
   }
 });
 
+test('Create token copy successfully', async () => {
+  const token = tokenFactory.createToken(tokenId, minPrice);
+
+  token.addBid(goodBid);
+
+  const tokenCp = tokenFactory.copyToken(token);
+
+  expect(tokenCp.getId()).toBe(tokenId);
+  expect(tokenCp.getMinPrice()).toBe(minPrice);
+  expect(tokenCp.getBids().length).toBe(1);
+});
+
 test('Create token fail all throws', async () => {
   try {
     const token = tokenFactory.createToken('a', minPrice);
