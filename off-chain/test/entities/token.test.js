@@ -44,16 +44,21 @@ test('Create token successfully', async () => {
   expect(token.getBids().length).toBe(1);
   expect(token.getBids()[0]).toBe(goodBid);
   expect(token.getBid(bidderAddr)).toBe(goodBid);
-  expect(token.getBid(bidderAddr + 1)).toBe(undefined);
-
-  token.deleteBid(bidderAddr);
-  expect(token.getBid(bidderAddr)).toBe(undefined);
 
   token.addBid(goodBid);
   token.addBid(goodBid);
   token.addBid(goodBid);
   token.addBid(goodBid);
   expect(token.getBids().length).toBe(1);
+
+  token.deleteBid(bidderAddr);
+
+  try {
+    token.getBid(bidderAddr);
+    fail('fun must throw');
+  } catch (err) {
+    expect(err.message).toBe('no bid found with bidderAddr ' + bidderAddr);
+  }
 
   try {
     token.addBid({});

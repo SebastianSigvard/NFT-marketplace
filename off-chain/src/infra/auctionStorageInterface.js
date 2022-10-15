@@ -21,6 +21,7 @@ export class AuctionStorageInterface {
   }
 
   // @return {AuctionList} Auction list.
+  // must throw if not list found
   getList(listId) {
     throw new Error('No implementation of AuctionStorageInterface virtual fun.');
     return {};

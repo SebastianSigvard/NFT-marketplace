@@ -44,7 +44,11 @@ class AuctionList {
   };
 
   getToken(tokenId) {
-    return this.#tokens.find((token) => token.getId() === tokenId);
+    const token = this.#tokens.find((token) => token.getId() === tokenId);
+    if (!token) {
+      throw Error('no token found with tokenId ' + tokenId);
+    }
+    return token;
   }
 
   getTokens() {

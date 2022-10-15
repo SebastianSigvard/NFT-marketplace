@@ -26,7 +26,13 @@ export class Token {
   }
 
   getBid(bidderAddr) {
-    return this.#bids.find((bid) => bid.getBidderAddr() === bidderAddr);
+    const bid = this.#bids.find((bid) => bid.getBidderAddr() === bidderAddr);
+
+    if (!bid) {
+      throw Error('no bid found with bidderAddr ' + bidderAddr);
+    }
+
+    return bid;
   }
 
   deleteBid(bidderAddr) {
