@@ -36,7 +36,6 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
     const list = this.#listFactory.createList(this.#nextListId++, ownerAddr, nftContractAddr, tokens);
     const listCp = this.#listFactory.copyList(list);
 
-    console.log(listCp.getListId());
     this.#lists[list.getListId()] = list;
 
     return listCp;
@@ -54,12 +53,12 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
 
     const listCp = this.#listFactory.copyList(list);
 
-    this.#lists[listCp.getListId] = listCp;
+    this.#lists[listCp.getListId()] = listCp;
   }
 
   deleteList(listId) {
     if (!this.#lists[listId]) {
-      throw Error('no list with listId ' + list.getListId());
+      throw Error('no list with listId ' + listId);
     }
 
     delete this.#lists[listId];
@@ -71,7 +70,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
     const list = this.#lists[listId];
 
     if (!list) {
-      throw Error('no list with listId ' + list.getListId());
+      throw Error('no list with listId ' + listId);
     }
 
     const listCp = this.#listFactory.copyList(list);
@@ -82,7 +81,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
   getLists() {
     const lists = [];
 
-    for (const list of this.#lists) {
+    for (const list of Object.values(this.#lists)) {
       const listCp = this.#listFactory.copyList(list);
 
       lists.push(listCp);

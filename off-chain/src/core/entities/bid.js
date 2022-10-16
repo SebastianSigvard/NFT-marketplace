@@ -111,12 +111,12 @@ export default class BidFactory {
     }
 
     return new Bid({ownerAddr,
-        bidderAddr,
-        nftContractAddr,
-        tokenId,
-        erc20ContractAddr,
-        erc20amount,
-        bidderSignature});
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
+      bidderSignature});
   }
 
   copyBid(bid) {

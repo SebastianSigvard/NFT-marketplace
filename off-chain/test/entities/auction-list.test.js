@@ -104,7 +104,6 @@ test('Create auctionList successfully', async () => {
   expect(auctionListCp.getTokens()).toStrictEqual([token1, token2]);
   expect(auctionListCp.getToken(tokenId)).toStrictEqual(token1);
   expect(auctionListCp.getToken(tokenId + 1)).toStrictEqual(token2);
-
 });
 test('AuctionListFactory fail test throw', async () => {
   const token1 = tokenFactory.createToken(tokenId, minPrice);
