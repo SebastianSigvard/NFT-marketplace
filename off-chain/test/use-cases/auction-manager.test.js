@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import AuctionManager from '../../src/core/use-cases/auction-manager.js';
+import AuctionManager from '../../src/core/auction-manager.js';
 import MemAuctionStorage from '../../src/infra/memAuctionStorage.js';
 import ValidatorMock from '../validator_mock.js';
 

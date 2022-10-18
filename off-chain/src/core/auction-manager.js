@@ -1,6 +1,6 @@
-import auctionStorageInterface, {AuctionStorageInterface} from '../../infra/auctionStorageInterface.js';
-import TokenFactory from '../entities/token.js';
-import BidFactory from '../entities/bid.js';
+import auctionStorageInterface, {AuctionStorageInterface} from './auctionStorageInterface.js';
+import TokenFactory from './entities/token.js';
+import BidFactory from './entities/bid.js';
 
 export default class AuctionManager {
   constructor(validator, auctionStorage = auctionStorageInterface) {
