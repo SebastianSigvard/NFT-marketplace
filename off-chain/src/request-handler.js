@@ -1,7 +1,9 @@
 import MemAuctionStorage from './infra/memAuctionStorage.js';
 import AuctionManager from './core/auction-manager.js';
 import Validator from './infra/validator.js';
+import dotenv from 'dotenv';
 import Web3 from 'web3';
+dotenv.config();
 
 class RequestHandler {
   constructor() {
