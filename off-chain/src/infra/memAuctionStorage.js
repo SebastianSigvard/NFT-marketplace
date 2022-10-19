@@ -19,7 +19,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
 
   // Must check if other list has same ownerAddr and nftContractAddr at same time
   // @return {AuctionList} Auction list.
-  createList(ownerAddr, nftContractAddr, tokens) {
+  async createList(ownerAddr, nftContractAddr, tokens) {
     const listsArray = Object.values(this.#lists);
 
     const foundList = listsArray.find((list) => {
@@ -33,7 +33,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
       throw Error('there is allready a list with requested ownerAddr and nftContractAddr');
     }
 
-    const list = this.#listFactory.createList(this.#nextListId++, ownerAddr, nftContractAddr, tokens);
+    const list = await this.#listFactory.createList(this.#nextListId++, ownerAddr, nftContractAddr, tokens);
     const listCp = this.#listFactory.copyList(list);
 
     this.#lists[list.getListId()] = list;
@@ -42,7 +42,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
   }
 
   // Must checks that list is an instance of AuctionList
-  updateList(list) {
+  async updateList(list) {
     if (! (list instanceof AuctionList)) {
       throw Error('list must be an instance of AuctionList');
     }
@@ -56,7 +56,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
     this.#lists[listCp.getListId()] = listCp;
   }
 
-  deleteList(listId) {
+  async deleteList(listId) {
     if (!this.#lists[listId]) {
       throw Error('no list with listId ' + listId);
     }
@@ -66,7 +66,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
 
   // @return {AuctionList} Auction list.
   // must throw if not list found
-  getList(listId) {
+  async getList(listId) {
     const list = this.#lists[listId];
 
     if (!list) {
@@ -78,7 +78,7 @@ export default class MemAuctionStorage extends AuctionStorageInterface {
     return listCp;
   }
 
-  getLists() {
+  async getLists() {
     const lists = [];
 
     for (const list of Object.values(this.#lists)) {

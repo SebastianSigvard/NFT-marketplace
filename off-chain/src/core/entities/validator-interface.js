@@ -4,12 +4,12 @@ export class ValidatorInterface {
     return {};
   }
 
-  isValidNftContract(nftContractAddr) {
+  async isValidNftContract(nftContractAddr) {
     throw new Error('No implementation of isValidNftContract virtual fun.');
     return {};
   }
 
-  isValidErc20Contract(erc20ContractAddr) {
+  async isValidErc20Contract(erc20ContractAddr) {
     throw new Error('No implementation of isValidErc20Contract virtual fun.');
     return {};
   }

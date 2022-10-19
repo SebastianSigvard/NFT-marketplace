@@ -15,7 +15,7 @@ const bidderSignature = 'fakeBidderSignature';
 const ownerSignature = 'fakeOwnerSignature';
 
 test('Create Bid successfully', async () => {
-  const bid = bidFactory.createBid(ownerAddr,
+  const bid = await bidFactory.createBid(ownerAddr,
       bidderAddr,
       nftContractAddr,
       tokenId,
@@ -37,7 +37,7 @@ test('Create Bid successfully', async () => {
 });
 
 test('Create Bid copy successfully', async () => {
-  const bid = bidFactory.createBid(ownerAddr,
+  const bid = await bidFactory.createBid(ownerAddr,
       bidderAddr,
       nftContractAddr,
       tokenId,
@@ -70,7 +70,7 @@ test('Create bidFactory fails for bad validator', async () => {
 
 test('Create Bid fail for bad tokenId', async () => {
   try {
-    const bid = bidFactory.createBid(ownerAddr,
+    const bid = await bidFactory.createBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         'a',
@@ -85,7 +85,7 @@ test('Create Bid fail for bad tokenId', async () => {
 
 test('Create Bid fail for negative tokenId', async () => {
   try {
-    const bid = bidFactory.createBid(ownerAddr,
+    const bid = await bidFactory.createBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         -1,
@@ -100,7 +100,7 @@ test('Create Bid fail for negative tokenId', async () => {
 
 test('Create Bid fail for negative tokenId', async () => {
   try {
-    const bid = bidFactory.createBid(ownerAddr,
+    const bid = await bidFactory.createBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         -1,
@@ -115,7 +115,7 @@ test('Create Bid fail for negative tokenId', async () => {
 
 test('Create Bid fail for bad erc20amount', async () => {
   try {
-    const bid = bidFactory.createBid(ownerAddr,
+    const bid = await bidFactory.createBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         tokenId,
@@ -130,7 +130,7 @@ test('Create Bid fail for bad erc20amount', async () => {
 
 test('Create Bid fail for negative erc20amount', async () => {
   try {
-    const bid = bidFactory.createBid(ownerAddr,
+    const bid = await bidFactory.createBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         tokenId,

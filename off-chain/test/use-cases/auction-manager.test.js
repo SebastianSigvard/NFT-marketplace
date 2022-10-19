@@ -18,7 +18,7 @@ const bidderSignature = 'fakeBidderSignature';
 const ownerSignature = 'fakeOwnerSignature';
 
 test('AuctionManager list', async () => {
-  const list = auctionManager.createList(ownerAddr,
+  const list = await auctionManager.createList(ownerAddr,
       nftContractAddr,
       [{tokenId, minPrice}],
   );
@@ -33,27 +33,27 @@ test('AuctionManager list', async () => {
   expect(token.getMinPrice()).toBe(minPrice);
   expect(token.getBids()).toStrictEqual([]);
 
-  auctionManager.deleteList(list.getListId());
+  await auctionManager.deleteList(list.getListId());
 
-  const lists = auctionManager.getLists();
+  const lists = await auctionManager.getLists();
 
   expect(lists.length).toBe(0);
 });
 
 test('AuctionManager token', async () => {
-  const list = auctionManager.createList(ownerAddr,
+  const list = await auctionManager.createList(ownerAddr,
       nftContractAddr,
       [{tokenId, minPrice}],
   );
 
-  auctionManager.addToken(list.getListId(),
+  await auctionManager.addToken(list.getListId(),
       {
         tokenId: tokenId + 1,
         minPrice: minPrice + 1,
       },
   );
 
-  let storedList = auctionManager.getList(list.getListId());
+  let storedList = await auctionManager.getList(list.getListId());
   let tokens = storedList.getTokens();
 
   expect(tokens.length).toBe(2);
@@ -62,32 +62,32 @@ test('AuctionManager token', async () => {
   expect(tokens[1].getId()).toBe(tokenId + 1);
   expect(tokens[1].getMinPrice()).toBe(minPrice + 1);
 
-  auctionManager.deleteToken(list.getListId(), tokenId + 1);
+  await auctionManager.deleteToken(list.getListId(), tokenId + 1);
 
-  storedList = auctionManager.getList(list.getListId());
+  storedList = await auctionManager.getList(list.getListId());
   tokens = storedList.getTokens();
 
   expect(tokens.length).toBe(1);
   expect(tokens[0].getId()).toBe(tokenId);
   expect(tokens[0].getMinPrice()).toBe(minPrice);
 
-  const token0 = auctionManager.getToken(list.getListId(), tokenId);
+  const token0 = await auctionManager.getToken(list.getListId(), tokenId);
 
   expect(token0.getId()).toBe(tokenId);
   expect(token0.getMinPrice()).toBe(minPrice);
 
-  auctionManager.deleteList(list.getListId());
-  const lists = auctionManager.getLists();
+  await auctionManager.deleteList(list.getListId());
+  const lists = await auctionManager.getLists();
   expect(lists.length).toBe(0);
 });
 
 test('AuctionManager bid', async () => {
-  const list = auctionManager.createList(ownerAddr,
+  const list = await auctionManager.createList(ownerAddr,
       nftContractAddr,
       [{tokenId, minPrice}],
   );
 
-  auctionManager.makeBid(ownerAddr,
+  await auctionManager.makeBid(ownerAddr,
       bidderAddr,
       nftContractAddr,
       tokenId,
@@ -96,7 +96,7 @@ test('AuctionManager bid', async () => {
       bidderSignature,
   );
 
-  let bid = auctionManager.getBid(list.getListId(), tokenId, bidderAddr);
+  let bid = await auctionManager.getBid(list.getListId(), tokenId, bidderAddr);
 
   expect(bid.getOwnerAddr()).toBe(ownerAddr);
   expect(bid.getBidderAddr()).toBe(bidderAddr);
@@ -107,13 +107,13 @@ test('AuctionManager bid', async () => {
   expect(bid.getOwnerSignature()).toBe(null);
   expect(bid.getBidderSignature()).toBe(bidderSignature);
 
-  auctionManager.approveBid(list.getListId(),
+  await auctionManager.approveBid(list.getListId(),
       tokenId,
       bidderAddr,
       ownerSignature,
   );
 
-  bid = auctionManager.getBid(list.getListId(), tokenId, bidderAddr);
+  bid = await auctionManager.getBid(list.getListId(), tokenId, bidderAddr);
 
   expect(bid.getOwnerAddr()).toBe(ownerAddr);
   expect(bid.getBidderAddr()).toBe(bidderAddr);
@@ -124,22 +124,22 @@ test('AuctionManager bid', async () => {
   expect(bid.getOwnerSignature()).toBe(ownerSignature);
   expect(bid.getBidderSignature()).toBe(bidderSignature);
 
-  auctionManager.deleteBid(list.getListId(), tokenId, bidderAddr);
+  await auctionManager.deleteBid(list.getListId(), tokenId, bidderAddr);
 
-  const token = auctionManager.getToken(list.getListId(), tokenId);
+  const token = await auctionManager.getToken(list.getListId(), tokenId);
   const bids = token.getBids();
 
   expect(bids.length).toBe(0);
 
-  auctionManager.deleteList(list.getListId());
-  const lists = auctionManager.getLists();
+  await auctionManager.deleteList(list.getListId());
+  const lists = await auctionManager.getLists();
   expect(lists.length).toBe(0);
 });
 
 
 test('AuctionManager throw test', async () => {
   try {
-    const list = auctionManager.createList(ownerAddr,
+    const list = await auctionManager.createList(ownerAddr,
         nftContractAddr,
         {tokenId, minPrice},
     );
@@ -150,7 +150,7 @@ test('AuctionManager throw test', async () => {
   }
 
   try {
-    const list = auctionManager.createList(ownerAddr,
+    const list = await auctionManager.createList(ownerAddr,
         nftContractAddr,
         [],
     );
@@ -161,7 +161,7 @@ test('AuctionManager throw test', async () => {
   }
 
   try {
-    const list = auctionManager.createList(ownerAddr,
+    const list = await auctionManager.createList(ownerAddr,
         nftContractAddr,
         [{}],
     );
@@ -172,14 +172,14 @@ test('AuctionManager throw test', async () => {
   }
 
   try {
-    auctionManager.addToken(0, {});
+    await auctionManager.addToken(0, {});
     expect(true).toBe(false);
   } catch (err) {
     expect(err.message).toBe('All tokens must has tokenId and minPrice');
   }
 
   try {
-    auctionManager.makeBid(ownerAddr,
+    await auctionManager.makeBid(ownerAddr,
         bidderAddr,
         nftContractAddr,
         tokenId,

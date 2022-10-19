@@ -71,7 +71,7 @@ export default class AuctionListFactory {
     this.#tokenFactory = new TokenFactory(validator);
   }
 
-  createList(listId, ownerAddr, nftContractAddr, tokens) {
+  async createList(listId, ownerAddr, nftContractAddr, tokens) {
     if (typeof listId !== 'number') {
       throw Error(listId + ' is not a number');
     }
@@ -80,7 +80,7 @@ export default class AuctionListFactory {
       throw Error(ownerAddr + ' is not a valid address');
     }
 
-    if (! this.#validator.isValidNftContract(nftContractAddr)) {
+    if (! await this.#validator.isValidNftContract(nftContractAddr)) {
       throw Error(nftContractAddr + ' is not a valid nft contract address');
     }
 

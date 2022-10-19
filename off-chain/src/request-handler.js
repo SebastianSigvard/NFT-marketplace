@@ -9,17 +9,18 @@ class RequestHandler {
   constructor() {
     const web3 = new Web3(process.env.API_URL);
 
-    this.#validator = new Validator(web3);
+    const validator = new Validator(web3);
 
-    const memAuctionStorage = new MemAuctionStorage(this.#validator);
+    const memAuctionStorage = new MemAuctionStorage(validator);
 
+    this.#validator = validator;
     this.#auctionManager = new AuctionManager(
         this.#validator,
         memAuctionStorage,
     );
   }
 
-  createList({ownerAddr, nftContractAddr, tokens, ownerSignature}) {
+  async createList({ownerAddr, nftContractAddr, tokens, ownerSignature}) {
     if ( ownerAddr === undefined ||
         nftContractAddr === undefined ||
         tokens === undefined ||
@@ -42,7 +43,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.createList(
+      const res = await this.#auctionManager.createList(
           ownerAddr,
           nftContract,
           tokens,
@@ -54,7 +55,7 @@ class RequestHandler {
     }
   }
 
-  deleteList({listId, ownerAddr, ownerSignature}) {
+  async deleteList({listId, ownerAddr, ownerSignature}) {
     if ( listId === undefined ||
         ownerAddr === undefined ||
         ownerSignature === undefined
@@ -75,7 +76,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.deleteList(listId);
+      const res = await this.#auctionManager.deleteList(listId);
 
       return {status: true, message: res};
     } catch (err) {
@@ -83,7 +84,7 @@ class RequestHandler {
     }
   }
 
-  getList({listId}) {
+  async getList({listId}) {
     if ( listId === undefined) {
       return {
         status: false,
@@ -92,7 +93,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.getList(listId);
+      const res = await this.#auctionManager.getList(listId);
 
       return {status: true, message: res};
     } catch (err) {
@@ -100,9 +101,9 @@ class RequestHandler {
     }
   }
 
-  getLists() {
+  async getLists() {
     try {
-      const res = this.#auctionManager.getLists();
+      const res = await this.#auctionManager.getLists();
 
       return {status: true, message: res};
     } catch (err) {
@@ -110,7 +111,7 @@ class RequestHandler {
     }
   }
 
-  addToken({listId, token, ownerAddr, ownerSignature}) {
+  async addToken({listId, token, ownerAddr, ownerSignature}) {
     if ( listId === undefined ||
         token === undefined ||
         ownerAddr === undefined ||
@@ -134,7 +135,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.addToken(
+      const res = await this.#auctionManager.addToken(
           listId,
           token,
       );
@@ -145,7 +146,7 @@ class RequestHandler {
     }
   }
 
-  deleteToken({listId, tokenId, ownerAddr, ownerSignature}) {
+  async deleteToken({listId, tokenId, ownerAddr, ownerSignature}) {
     if ( listId === undefined ||
         tokenId === undefined ||
         ownerAddr === undefined ||
@@ -169,7 +170,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.deleteToken(
+      const res = await this.#auctionManager.deleteToken(
           listId,
           tokenId,
       );
@@ -180,7 +181,7 @@ class RequestHandler {
     }
   }
 
-  getToken({listId, tokenId}) {
+  async getToken({listId, tokenId}) {
     if ( listId === undefined ||
         tokenId === undefined
     ) {
@@ -191,7 +192,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.getToken(
+      const res = await this.#auctionManager.getToken(
           listId,
           tokenId,
       );
@@ -202,7 +203,7 @@ class RequestHandler {
     }
   }
 
-  makeBid({ownerAddr,
+  async makeBid({ownerAddr,
     bidderAddr,
     nftContractAddr,
     tokenId,
@@ -244,7 +245,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.makeBid(ownerAddr,
+      const res = await this.#auctionManager.makeBid(ownerAddr,
           bidderAddr,
           nftContractAddr,
           tokenId,
@@ -259,7 +260,7 @@ class RequestHandler {
     }
   }
 
-  deleteBid({listId, tokenId, bidderAddr, bidderSignature}) {
+  async deleteBid({listId, tokenId, bidderAddr, bidderSignature}) {
     if ( listId === undefined ||
         tokenId === undefined ||
         bidderAddr === undefined ||
@@ -283,7 +284,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.deleteBid(
+      const res = await this.#auctionManager.deleteBid(
           listId,
           tokenId,
           bidderAddr,
@@ -295,7 +296,7 @@ class RequestHandler {
     }
   }
 
-  approveBid({ownerAddr,
+  async approveBid({ownerAddr,
     bidderAddr,
     nftContractAddr,
     tokenId,
@@ -337,7 +338,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.approveBid(listId,
+      const res = await this.#auctionManager.approveBid(listId,
           tokenId,
           bidderAddr,
           ownerSignatur,
@@ -349,7 +350,7 @@ class RequestHandler {
     }
   }
 
-  getBid({listId, tokenId, bidderAddr}) {
+  async getBid({listId, tokenId, bidderAddr}) {
     if ( listId === undefined ||
         tokenId === undefined ||
         bidderAddr === undefined
@@ -361,7 +362,7 @@ class RequestHandler {
     }
 
     try {
-      const res = this.#auctionManager.getBid(listId,
+      const res = await this.#auctionManager.getBid(listId,
           tokenId,
           bidderAddr,
       );

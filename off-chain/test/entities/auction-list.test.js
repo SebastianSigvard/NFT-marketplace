@@ -41,7 +41,7 @@ test('Create auctionList successfully', async () => {
   const token2 = tokenFactory.createToken(tokenId + 1, minPrice);
   const token3 = tokenFactory.createToken(tokenId + 2, minPrice);
 
-  const auctionList = auctionListFactory.createList(
+  const auctionList = await auctionListFactory.createList(
       listId,
       ownerAddr,
       nftContractAddr,
@@ -89,7 +89,7 @@ test('Create auctionList successfully', async () => {
   const token2 = tokenFactory.createToken(tokenId + 1, minPrice);
   const token3 = tokenFactory.createToken(tokenId + 2, minPrice);
 
-  const auctionList = auctionListFactory.createList(
+  const auctionList = await auctionListFactory.createList(
       listId,
       ownerAddr,
       nftContractAddr,
@@ -110,7 +110,7 @@ test('AuctionListFactory fail test throw', async () => {
   const token2 = tokenFactory.createToken(tokenId + 1, minPrice);
 
   try {
-    const auctionList = auctionListFactory.createList(
+    const auctionList = await auctionListFactory.createList(
         'a',
         ownerAddr,
         nftContractAddr,
@@ -122,7 +122,7 @@ test('AuctionListFactory fail test throw', async () => {
   }
 
   try {
-    const auctionList = auctionListFactory.createList(
+    const auctionList = await auctionListFactory.createList(
         listId,
         ownerAddr,
         nftContractAddr,
@@ -134,7 +134,7 @@ test('AuctionListFactory fail test throw', async () => {
   }
 
   try {
-    const auctionList = auctionListFactory.createList(
+    const auctionList = await auctionListFactory.createList(
         listId,
         ownerAddr,
         nftContractAddr,

@@ -17,7 +17,7 @@ const erc20amount = 11;
 const bidderSignature = 'fakeBidderSignature';
 const ownerSignature = 'fakeOwnerSignature';
 
-const goodBid = bidFactory.createBid(ownerAddr,
+const goodBid = await bidFactory.createBid(ownerAddr,
     bidderAddr,
     nftContractAddr,
     tokenId,
@@ -25,7 +25,7 @@ const goodBid = bidFactory.createBid(ownerAddr,
     erc20amount,
     bidderSignature);
 
-const badBid = bidFactory.createBid(ownerAddr,
+const badBid = await bidFactory.createBid(ownerAddr,
     bidderAddr,
     nftContractAddr,
     tokenId,

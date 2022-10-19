@@ -67,7 +67,7 @@ export default class BidFactory {
     this.#validator = validator;
   }
 
-  createBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
+  async createBid(ownerAddr, bidderAddr, nftContractAddr, tokenId, erc20ContractAddr, erc20amount, bidderSignature) {
     if (! this.#validator.isValidAddr(ownerAddr)) {
       throw Error(ownerAddr + ' ownerAddr is not a valid address');
     }
@@ -76,7 +76,7 @@ export default class BidFactory {
       throw Error(bidderAddr + ' bidderAddr is not a valid address');
     }
 
-    if (! this.#validator.isValidNftContract(nftContractAddr)) {
+    if (! await this.#validator.isValidNftContract(nftContractAddr)) {
       throw Error(nftContractAddr + ' is not a valid nft contract address');
     }
 
@@ -88,7 +88,7 @@ export default class BidFactory {
       throw Error(tokenId + ' tokenId must be greater than 0');
     }
 
-    if (! this.#validator.isValidErc20Contract(erc20ContractAddr)) {
+    if (! await this.#validator.isValidErc20Contract(erc20ContractAddr)) {
       throw Error(erc20ContractAddr + ' is not a valid erc20 contract address');
     }
 
