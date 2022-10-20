@@ -66,7 +66,7 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(ownerSignature, ownerAddr,
+    if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
         listId)
     ) {
       return {
@@ -76,9 +76,9 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.deleteList(listId);
+      await this.#auctionManager.deleteList(listId);
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }
@@ -123,7 +123,7 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(ownerSignature, ownerAddr,
+    if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
         listId,
         token,
         ownerAddr)
@@ -135,12 +135,12 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.addToken(
+      await this.#auctionManager.addToken(
           listId,
           token,
       );
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }
@@ -158,7 +158,7 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(ownerSignature, ownerAddr,
+    if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
         listId,
         tokenId,
         ownerAddr)
@@ -170,12 +170,12 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.deleteToken(
+      await this.#auctionManager.deleteToken(
           listId,
           tokenId,
       );
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }
@@ -230,13 +230,13 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(bidderSignature, bidderAddr,
+    if ( ! this.#validator.isSignatureValid(bidderSignature, bidderAddr,
         ownerAddr,
         bidderAddr,
         nftContractAddr,
         tokenId,
         erc20ContractAddr,
-        erc20amountlistId)
+        erc20amount)
     ) {
       return {
         status: false,
@@ -245,7 +245,7 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.makeBid(ownerAddr,
+      await this.#auctionManager.makeBid(ownerAddr,
           bidderAddr,
           nftContractAddr,
           tokenId,
@@ -254,7 +254,7 @@ class RequestHandler {
           bidderSignature,
       );
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }
@@ -272,7 +272,7 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(bidderSignature, bidderAddr,
+    if ( ! this.#validator.isSignatureValid(bidderSignature, bidderAddr,
         listId,
         tokenId,
         bidderAddr)
@@ -284,52 +284,44 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.deleteBid(
+      await this.#auctionManager.deleteBid(
           listId,
           tokenId,
           bidderAddr,
       );
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }
   }
 
-  async approveBid({ownerAddr,
-    bidderAddr,
-    nftContractAddr,
+  async approveBid({listId,
     tokenId,
-    erc20ContractAddr,
-    erc20amount,
+    bidderAddr,
+    ownerAddr,
     ownerSignature}) {
-    if ( ownerAddr === undefined ||
-        bidderAddr === undefined ||
-        nftContractAddr === undefined ||
+    if ( listId === undefined ||
         tokenId === undefined ||
-        erc20ContractAddr === undefined ||
-        erc20amount === undefined ||
+        bidderAddr === undefined ||
+        ownerAddr === undefined ||
         ownerSignature === undefined
     ) {
       return {
         status: false,
-        message: 'body must have ownerAddr, ' +
-      'bidderAddr, ' +
-      'nftContractAddr, ' +
+        message: 'body must have listId, ' +
       'tokenId, ' +
-      'erc20ContractAddr, ' +
-      'erc20amount and ' +
+      'bidderAddr, ' +
+      'ownerAddr, ' +
       'ownerSignature',
       };
     }
 
-    if ( this.#validator.isSignatureValid(ownerSignature, ownerAddr,
-        ownerAddr,
-        bidderAddr,
-        nftContractAddr,
+    if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
+        listId,
         tokenId,
-        erc20ContractAddr,
-        erc20amountlistId)
+        bidderAddr,
+        ownerAddr)
     ) {
       return {
         status: false,
@@ -338,13 +330,13 @@ class RequestHandler {
     }
 
     try {
-      const res = await this.#auctionManager.approveBid(listId,
+      await this.#auctionManager.approveBid(listId,
           tokenId,
           bidderAddr,
-          ownerSignatur,
+          ownerSignature,
       );
 
-      return {status: true, message: res};
+      return {status: true};
     } catch (err) {
       return {status: false, message: err.message};
     }

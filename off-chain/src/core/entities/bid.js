@@ -17,7 +17,7 @@ export class Bid {
   }
 
   getBidderAddr() {
-    return this.#ownerAddr;
+    return this.#bidderAddr;
   }
 
   getNftContractAddr() {
