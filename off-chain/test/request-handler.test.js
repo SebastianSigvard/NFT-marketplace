@@ -34,8 +34,7 @@ test('RequestHandler list', async () => {
     ownerSignature
   });
 
-  console.log(res.message);
   expect(res.status).toBe(true);
-  expect(res.message).toBe('gg');
+  expect(res.message.getListId()).toBe(0);
 });
 

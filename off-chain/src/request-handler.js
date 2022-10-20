@@ -32,7 +32,7 @@ class RequestHandler {
       };
     }
 
-    if ( this.#validator.isSignatureValid(ownerSignature, ownerAddr,
+    if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
         ownerAddr,
         nftContractAddr)
     ) {
@@ -45,7 +45,7 @@ class RequestHandler {
     try {
       const res = await this.#auctionManager.createList(
           ownerAddr,
-          nftContract,
+          nftContractAddr,
           tokens,
       );
 
