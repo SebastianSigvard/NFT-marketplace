@@ -1,7 +1,7 @@
 import {ValidatorInterface} from '../core/entities/validator-interface.js';
 import Web3 from 'web3';
-import erc721 from '@openzeppelin/contracts/build/contracts/ERC721.json';
-import erc20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
+import erc721 from '@openzeppelin/contracts/build/contracts/ERC721.json' assert { type: "json" };
+import erc20 from '@openzeppelin/contracts/build/contracts/ERC20.json' assert { type: "json" };
 
 /**
  * Validator, checks validity of address and NFT and ERC20 tokens
