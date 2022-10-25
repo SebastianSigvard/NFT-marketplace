@@ -8,7 +8,7 @@ require('dotenv').config();
  * them to suit your project as necessary.
  *
  * More information about configuration can be found at:
- * 
+ *
  * https://trufflesuite.com/docs/truffle/reference/configuration
  *
  * To deploy via Infura you'll need a wallet provider (like @truffle/hdwallet-provider)
@@ -38,12 +38,12 @@ module.exports = {
    */
 
   networks: {
-    ropsten: {
+    goerli: {
       provider: ()=> new HDWalletProvider(
         [process.env.PRIVATE_KEY],
         process.env.API_URL
       ),
-      network_id: 3,
+      network_id: 5,
       networkCheckTimeout: 10000
     }
   },
