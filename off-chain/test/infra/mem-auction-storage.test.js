@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import MemAuctionStorage from '../../src/infra/memAuctionStorage.js';
+import MemAuctionStorage from '../../src/infra/mem-auction-storage.js';
 import ValidatorMock from '../validator_mock.js';
 import TokenFactory from '../../src/core/entities/token.js';
 

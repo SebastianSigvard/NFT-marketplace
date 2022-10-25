@@ -1,4 +1,4 @@
-import auctionStorageInterface, {AuctionStorageInterface} from './auctionStorageInterface.js';
+import auctionStorageInterface, {AuctionStorageInterface} from './auction-storage-interface.js';
 import TokenFactory from './entities/token.js';
 import BidFactory from './entities/bid.js';
 

@@ -1,4 +1,4 @@
-import MemAuctionStorage from './infra/memAuctionStorage.js';
+import MemAuctionStorage from './infra/mem-auction-storage.js';
 import AuctionManager from './core/auction-manager.js';
 import Validator from './infra/validator.js';
 import dotenv from 'dotenv';

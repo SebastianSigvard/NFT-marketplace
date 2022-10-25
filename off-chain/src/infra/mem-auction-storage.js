@@ -1,4 +1,4 @@
-import {AuctionStorageInterface} from '../core/auctionStorageInterface.js';
+import {AuctionStorageInterface} from '../core/auction-storage-interface.js';
 import ListFactory, {AuctionList} from '../core/entities/auction-list.js';
 
 /**
