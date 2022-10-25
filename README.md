@@ -17,7 +17,7 @@ cd on-chain
 npx truffle test
 ```
 ### ADDR
-CheapNFTMarketplace contract address in ropsten: 0x9BD71EA9A8Fea78787a27f0E733B74fefB02e76e
+CheapNFTMarketplace contract address in goerli: 0xD1B5181d5BAd76aCda25Da586ce40D3E66C3f41E
 
 ## OFF-CHAIN
 ### API ENDPOINTS
@@ -34,10 +34,10 @@ CheapNFTMarketplace contract address in ropsten: 0x9BD71EA9A8Fea78787a27f0E733B7
 /bid:
 - POST: Add or update a bid to a specific token
 - DELTE: Delete a bid
+- GET: Get a bid
 
 /approve:
 - POST: Owner approves a bid
-- GET: Get an approved bid
 
 ### TEST
 To test core logic please run:
@@ -46,6 +46,7 @@ To test core logic please run:
 cd off-chain
 npm run test
 ```
-### TODOS:
- - Check correct handling of events in off chain system.
- - Check erc20 addres in end point API and accept only one contract.
+### Architecture:
+This projects implement clean architecture from uncle Bob:
+
+![image](https://user-images.githubusercontent.com/83707961/197856979-58d6e81f-cae4-4590-ba19-baa0592e66ca.png)
