@@ -67,7 +67,8 @@ class RequestHandler {
     }
 
     if ( ! this.#validator.isSignatureValid(ownerSignature, ownerAddr,
-        listId)
+        listId,
+        ownerAddr)
     ) {
       return {
         status: false,

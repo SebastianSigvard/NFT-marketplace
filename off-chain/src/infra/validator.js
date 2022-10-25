@@ -7,7 +7,7 @@ import erc20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
  * Validator, checks validity of address and NFT and ERC20 tokens
  * ownership and approvals.
  */
-export default class Validator extends ValidatorInterface{
+export default class Validator extends ValidatorInterface {
   constructor(web3) {
     super();
 

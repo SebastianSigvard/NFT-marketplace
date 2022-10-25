@@ -6,10 +6,10 @@ dotenv.config();
 const web3 = new Web3(process.env.API_URL);
 
 const ownerAccount = web3.eth.accounts.privateKeyToAccount(
-  process.env.TEST_OWNER_PRIVATE_KEY
+    process.env.TEST_OWNER_PRIVATE_KEY,
 );
 const bidderAccount = web3.eth.accounts.privateKeyToAccount(
-  process.env.TEST_BIDDER_PRIVATE_KEY
+    process.env.TEST_BIDDER_PRIVATE_KEY,
 );
 
 web3.eth.accounts.wallet.add(ownerAccount);
@@ -31,7 +31,7 @@ test('RequestHandler list', async () => {
     ownerAddr,
     nftContractAddr,
     tokens: [{tokenId, minPrice}],
-    ownerSignature
+    ownerSignature,
   });
 
   expect(res.status).toBe(true);
@@ -49,15 +49,15 @@ test('RequestHandler list', async () => {
 
   // Add token
   message = web3.utils.soliditySha3(0,
-    {tokenId: tokenId +1, minPrice},
-    ownerAddr
+      {tokenId: tokenId +1, minPrice},
+      ownerAddr,
   );
   ownerSignature = await web3.eth.sign(message, ownerAddr);
 
   res = await requestHandler.addToken({listId: 0,
     token: {tokenId: tokenId +1, minPrice},
     ownerAddr,
-    ownerSignature}
+    ownerSignature},
   );
   expect(res.status).toBe(true);
 
@@ -67,15 +67,15 @@ test('RequestHandler list', async () => {
 
   // Delete Token
   message = web3.utils.soliditySha3(0,
-    tokenId +1,
-    ownerAddr
+      tokenId +1,
+      ownerAddr,
   );
   ownerSignature = await web3.eth.sign(message, ownerAddr);
 
   res = await requestHandler.deleteToken({listId: 0,
     tokenId: tokenId +1,
     ownerAddr,
-    ownerSignature}
+    ownerSignature},
   );
   expect(res.status).toBe(true);
 
@@ -91,14 +91,14 @@ test('RequestHandler list', async () => {
 
   // Make Bid
   message = web3.utils.soliditySha3(ownerAddr,
-    bidderAddr,
-    nftContractAddr,
-    tokenId,
-    erc20ContractAddr,
-    erc20amount
+      bidderAddr,
+      nftContractAddr,
+      tokenId,
+      erc20ContractAddr,
+      erc20amount,
   );
 
-  const bidderSignature = await web3.eth.sign(message, bidderAddr);
+  let bidderSignature = await web3.eth.sign(message, bidderAddr);
 
   res = await requestHandler.makeBid({ownerAddr,
     bidderAddr,
@@ -106,7 +106,7 @@ test('RequestHandler list', async () => {
     tokenId,
     erc20ContractAddr,
     erc20amount,
-    bidderSignature
+    bidderSignature,
   });
 
   expect(res.status).toBe(true);
@@ -118,9 +118,9 @@ test('RequestHandler list', async () => {
 
   // Approve Bid
   message = web3.utils.soliditySha3(0,
-    tokenId,
-    bidderAddr,
-    ownerAddr
+      tokenId,
+      bidderAddr,
+      ownerAddr,
   );
 
   ownerSignature = await web3.eth.sign(message, ownerAddr);
@@ -129,10 +129,9 @@ test('RequestHandler list', async () => {
     tokenId,
     bidderAddr,
     ownerAddr,
-    ownerSignature
+    ownerSignature,
   });
 
-  console.log(res.message);
   expect(res.status).toBe(true);
 
   res = await requestHandler.getToken({listId: 0, tokenId});
@@ -141,6 +140,43 @@ test('RequestHandler list', async () => {
   expect(res.message.getBids()[0].getBidderAddr()).toBe(bidderAddr);
   expect(res.message.getBids()[0].getOwnerSignature()).toBe(ownerSignature);
 
-  // TODO Get Bid, Delete Bid and Delete List
+  // Get Bid
+  res = await requestHandler.getBid({listId: 0, tokenId, bidderAddr});
+
+  expect(res.status).toBe(true);
+  expect(res.message.getBidderAddr()).toBe(bidderAddr);
+  expect(res.message.getOwnerSignature()).toBe(ownerSignature);
+
+  // Delete Bid
+  message = web3.utils.soliditySha3(0,
+      tokenId,
+      bidderAddr,
+  );
+
+  bidderSignature = await web3.eth.sign(message, bidderAddr);
+  res = await requestHandler.deleteBid({listId: 0, tokenId, bidderAddr, bidderSignature});
+
+  expect(res.status).toBe(true);
+
+  res = await requestHandler.getBid({listId: 0, tokenId, bidderAddr});
+
+  expect(res.status).toBe(false);
+  expect(res.message).toBe('no bid found with bidderAddr ' + bidderAddr);
+
+  // Delete List
+  message = web3.utils.soliditySha3(0,
+      ownerAddr,
+  );
+
+  ownerSignature = await web3.eth.sign(message, ownerAddr);
+  res = await requestHandler.deleteList({listId: 0, ownerAddr, ownerSignature});
+
+  console.log(res.message);
+  expect(res.status).toBe(true);
+
+  res = await requestHandler.getList({listId: 0});
+
+  expect(res.status).toBe(false);
+  expect(res.message).toBe('no list with listId 0');
 }, 30000);
 
